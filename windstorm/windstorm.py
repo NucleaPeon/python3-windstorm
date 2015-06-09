@@ -32,8 +32,9 @@ class Windstorm(daemon.Daemon):
     def __init__(self, pidfile):
         super().__init__(self)
         self.pidfile = pidfile
+        self.webpath = os.path.join(os.getcwd(), 'www')
         self.application = tornado.web.Application([
-            (r"/", Windstorm.Routes),
+            (r"/(.*)", tornado.web.StaticFileHandler, {'path': self.webpath}),
         ])
         
     def run(self):
@@ -44,12 +45,13 @@ class Windstorm(daemon.Daemon):
 if __name__ == "__main__":
     pidfile = os.path.join(os.sep, 'var', 'run', 'windstorm.pid')
     try:
+        # Predetermine if permissions are OK
         with open(pidfile, 'w') as f:
             pass
         
     except PermissionError as pE:
+        # Reset pidfile to location where is assumed writable.
         pidfile = os.path.join(os.environ.get('HOME', os.getcwd()), 'windstorm.pid') # writable file
-        print("Pidfile is now at {}".format(pidfile))
         
     if os.path.exists(pidfile):
         pfile = open(pidfile, 'r')
