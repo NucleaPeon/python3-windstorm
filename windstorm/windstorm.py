@@ -25,8 +25,11 @@ class Windstorm(daemon.Daemon):
     
     class Routes(tornado.web.RequestHandler):
         
+        def initialize(self, path=''):
+            self.path = path
+        
         def get(self, *args, **kwargs):
-            self.write("GET at root /")
+            self.render(self.path)
     
     
     def __init__(self, pidfile):
@@ -34,7 +37,9 @@ class Windstorm(daemon.Daemon):
         self.pidfile = pidfile
         self.webpath = os.path.join(os.getcwd(), 'www')
         self.application = tornado.web.Application([
-            (r"/(.*)", tornado.web.StaticFileHandler, {'path': self.webpath}),
+            (r"/(favicon\.ico)", tornado.web.StaticFileHandler, dict(path=self.webpath)),
+            (r"/", Windstorm.Routes, {'path': os.path.join(self.webpath, 'index.html')}),
+            (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(self.webpath, 'js')}),
         ])
         
     def run(self):
@@ -44,6 +49,7 @@ class Windstorm(daemon.Daemon):
     
 if __name__ == "__main__":
     pidfile = os.path.join(os.sep, 'var', 'run', 'windstorm.pid')
+    # TODO: Tornado cli
     try:
         # Predetermine if permissions are OK
         with open(pidfile, 'w') as f:
