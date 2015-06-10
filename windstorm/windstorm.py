@@ -39,7 +39,7 @@ class Windstorm(daemon.Daemon):
         self.application = tornado.web.Application([
             (r"/(favicon\.ico)", tornado.web.StaticFileHandler, dict(path=self.webpath)),
             (r"/", Windstorm.Routes, {'path': os.path.join(self.webpath, 'index.html')}),
-            (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(self.webpath, 'js')}),
+            (r"/(.*)", tornado.web.StaticFileHandler, dict(path=self.webpath)),
         ])
         
     def run(self):
