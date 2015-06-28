@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block supplimentaryjs %}
+    <script src="/js/windstorm-software.js"></script>
+{% end %}
+{% block sidenav %}
+    <li class="list-group-item" style="cursor:pointer;" onclick="go_home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</li>
+    <li class="list-group-item active" style="cursor:pointer;" onclick="go_software()"><span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span> Software</li>
+    <li class="list-group-item" style="cursor:pointer;" onclick="go_testsuite()"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Test Suites</li>
+    <li class="list-group-item" style="cursor:pointer;" onclick="go_results()"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Results</li>
+    <li class="list-group-item" style="cursor:pointer;" onclick="go_settings()"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Settings</li>
+    <li class="list-group-item" style="cursor:pointer;" onclick="go_about()"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</li>
+{% end %}
+{% block main_content %}
+<div class="btn-group btn-group-sm" role="group" aria-label="SoftwareOptionBar">
+  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#AddNewSoftware"><span class="glyphicon glyphicon-plus"></span> Add</button>
+  <div class="btn-group btn-group-sm" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon-sort"></span> Sort By
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Name</a></li>
+      <li><a href="#">Size</a></li>
+      <li><a href="#">Test Cases</a></li>
+      <li><a href="#">Activity</a></li>
+      <li><a href="#">Failed Tests</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="AddNewSoftware" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add New Software Project</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+            <span class="input-group-addon" id="project_title">Title</span>
+            <input id="mpname" type="text" class="form-control" placeholder="Project Name" aria-describedby="project_username"><br />
+        </div>
+        
+        <!--  # Ignore top level directory location for project files for now
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Drag and Drop Project Folder Here" id="ProjectLocation">
+            <span class="input-group-btn">
+                <span class="btn btn-default btn-file">
+                    Browse <input type="file" directory="" webkitdirectory="">
+                </span>
+            </span>
+            
+        </div>
+        -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="SaveProject()"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<br />
+<br />
+<div id="ProjectListingDiv">
+</div>
+{% end %}
+
+{% block customjs %}
+$(document).on('change', '.btn-file :file', function() {
+    var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+    $('#ProjectLocation').val(input.val());
+});
+
+$(document).ready( function() {
+    $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+        console.log(numFiles);
+        console.log(label);
+    });
+    GetProjects();
+    
+});
+{% end %}
