@@ -4,7 +4,6 @@ import datetime
 import signal
 import resource
 
-
 class Daemon(object):
 
 
