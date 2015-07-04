@@ -1,3 +1,14 @@
+function AddProject() {
+    $("#AddNewSoftware").modal("show");
+    $("#AddNewSoftware").on("shown.bs.modal", function() {
+        $('#mpname').focus();
+        $(document).keypress(function(e) {
+            if(e.which == 13) {
+                $('#SaveSoftwareBtn').click();
+            }
+        });
+    });
+}
 
 function SaveProject() {
     if (($('#mpname').val() == "") || ($('#mpname').val() === undefined)) {
@@ -11,7 +22,6 @@ function SaveProject() {
                if ($('#Warn_NoProject').length > 0) {
                     $('#Warn_NoProject').remove();
                }
-               console.log(data.results.project.title);
                AppendProjectPanel(data.results.project.title);
            }
     );
@@ -51,46 +61,46 @@ function DisplayProjects(projects) {
 
 function AppendProjectPanel(title) {
     $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
-        .append($("<div>").addClass("panel-heading").append($("<span>").html(title + " ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
+        .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
             DeleteSoftware(title);
         } )))
-        .append($("<div>").addClass("panel-body").append(GenerateSoftwareSummary())));
+        .append($("<div>").addClass("panel-body").append(
+            GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project"))
+            .on("click", function() { 
+                ProjectSettingsModal(title);
+                $('#SoftwareDetails').modal("show");
+                return false; // Required to stop modal window from hiding immediately
+            })
+        )
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#SoftwareDetails"));
 }
 
 function DeleteSoftware(title) {
     $.post('http://localhost:9090/Services/DeleteProject/',
            {'title': JSON.stringify(title)},
            function(project) {
-               console.log(project);
-               console.log(project.results);
                if (project.results.deleted == "true") {
                    $('#' + title).remove();
                    GetProjects();
                }
-               else {
-               }
-           }
-    );
-    
+           });
+}
+
+function ProjectSettingsModal(title) {
+    $('#modal-header-title').html(title);
     
 }
 
-function GenerateSoftwareSummary() {
-    /**
-    <div class="media">
-  <div class="media-left media-middle">
-    <a href="#">
-      <img class="media-object" src="..." alt="...">
-    </a>
-  </div>
-  <div class="media-body">
-    <h4 class="media-heading">Middle aligned media</h4>
-    ...
-  </div>
-</div>
-**/
+function GenerateSoftwareSummary(body, heading, image) {
+    var img = (image === undefined) ? "/imgs/folder-tar.png" : image;
+    var header = (heading === undefined) ? "Untitled Heading" : heading;
     return $("<div>").addClass("media")
         .append($("<div>").addClass("media-left media-middle")
             .append($("<a>").attr("href", "#")
-                .append("<img>").addClass("media-object").attr({"src": "...", "alt": "..."})));
+                .append('<img class="media-object" src="' + img + '" alt="' + img + '">'))
+         ).append($("<div>").addClass("media-body")
+             .append($("<h4>").addClass("media-heading").html(header))
+             .append(body)
+        );
 }

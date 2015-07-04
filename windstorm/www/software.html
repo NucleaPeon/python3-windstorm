@@ -12,7 +12,7 @@
 {% end %}
 {% block main_content %}
 <div class="btn-group btn-group-sm" role="group" aria-label="SoftwareOptionBar">
-  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#AddNewSoftware"><span class="glyphicon glyphicon-plus"></span> Add</button>
+  <button type="button" class="btn btn-default" onclick="AddProject();"><span class="glyphicon glyphicon-plus"></span> Add</button>
   <div class="btn-group btn-group-sm" role="group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="glyphicon glyphicon-sort"></span> Sort By
@@ -29,6 +29,19 @@
       <li><a href="#">Failed Tests</a></li>
     </ul>
   </div>
+</div>
+
+<div id="SoftwareDetails" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-header-title">Title</span>
+            </div>
+            <div class="modal-body">
+                Hello World
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="AddNewSoftware" class="modal fade" role="dialog">
@@ -58,7 +71,7 @@
         -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="SaveProject()"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="SaveProject()" id="SaveSoftwareBtn"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
       </div>
     </div>
