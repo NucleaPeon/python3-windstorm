@@ -50,11 +50,26 @@ class Services(daemon.Daemon):
             
             self.write({"results": None})
         
+        
     def __init__(self, pidfile):
         super().__init__(self)
         self.pidfile = pidfile
-        # temporary cache for keeping projects in until we get an sql/nosql db sorted out
-        self.projects = {} 
+        # Information Cache:
+        self.projects = {
+            'TestProject' : {
+                'title': "TestProject",
+                'files': [],
+                'depends': {
+                    'services': [],
+                    'files': [],
+                    'windstorms': []
+                },
+                'testsuitegroup': "TestTestGroup"
+            }
+        }
+        self.testsuites = {'TestTestSuite': {}}
+        self.testgroups = {'TestTestGroup': ['TestTestSuite']}
+        
         self.application = tornado.web.Application([
             (r"/(.*)/", self.Routes, {"service": self}),
         ])
@@ -62,7 +77,6 @@ class Services(daemon.Daemon):
     def run(self):
         server = HTTPServer(self.application)
         server.listen(9091, address='localhost')
-        
         tornado.ioloop.IOLoop.current().start()
         
     @ServiceParams

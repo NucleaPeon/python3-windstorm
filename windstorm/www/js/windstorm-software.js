@@ -53,7 +53,7 @@ function DisplayProjects(projects) {
     else {
         if ($('#Warn_NoProject').length == 0) {
             $('#NotificationBlock').append(
-                '<div id="Warn_NoProject" class="alert alert-warning" role="alert"><span class="glyphicon glyphicon-warning-sign"></span> No projects found. <a href="#" data-toggle="modal" data-target="#AddNewSoftware">Click here to add one</a> </div>'
+                '<div id="Warn_NoProject" class="alert alert-warning" role="alert"><span class="glyphicon glyphicon-warning-sign"></span> No projects found. <a href="#" onclick="AddProject();">Click here to add one</a> </div>'
             );
         }
     }
@@ -63,15 +63,16 @@ function AppendProjectPanel(title) {
     $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
         .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
             DeleteSoftware(title);
-        } )))
+        })).on("click", function() { 
+            return false; // Fix for issue where clicking on header invokes body onclick event
+        }))
         .append($("<div>").addClass("panel-body").append(
-            GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project"))
-            .on("click", function() { 
+            GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project").on("click", function() { 
                 ProjectSettingsModal(title);
                 $('#SoftwareDetails').modal("show");
                 return false; // Required to stop modal window from hiding immediately
-            })
-        )
+            }
+        )))
         .attr("data-toggle", "modal")
         .attr("data-target", "#SoftwareDetails"));
 }
