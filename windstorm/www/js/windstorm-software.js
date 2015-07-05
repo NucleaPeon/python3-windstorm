@@ -23,6 +23,7 @@ function SaveProject() {
                     $('#Warn_NoProject').remove();
                }
                AppendProjectPanel(data.results.project.title);
+               $("#Messages").append($("<li>").addClass("list-group-item").html("..."));
            }
     );
     
@@ -45,6 +46,7 @@ function GetProjects(callback) {
 
 function DisplayProjects(projects) {
     for (var i=0; i < projects.results.length; i++) {
+        console.log("Displaying project " + i);
         AppendProjectPanel(projects.results[i]);
     }
     if (projects.results.length > 0) {
@@ -60,21 +62,23 @@ function DisplayProjects(projects) {
 }
 
 function AppendProjectPanel(title) {
-    $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
-        .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
-            DeleteSoftware(title);
-        })).on("click", function() { 
-            return false; // Fix for issue where clicking on header invokes body onclick event
-        }))
-        .append($("<div>").addClass("panel-body").append(
-            GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project").on("click", function() { 
-                ProjectSettingsModal(title);
-                $('#SoftwareDetails').modal("show");
-                return false; // Required to stop modal window from hiding immediately
-            }
-        )))
-        .attr("data-toggle", "modal")
-        .attr("data-target", "#SoftwareDetails"));
+    if ($('#' + title).length == 0) {
+        $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
+            .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
+                DeleteSoftware(title);
+            })).on("click", function() { 
+                return false; // Fix for issue where clicking on header invokes body onclick event
+            }))
+            .append($("<div>").addClass("panel-body").append(
+                GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project").on("click", function() { 
+                    ProjectSettingsModal(title);
+                    $('#SoftwareDetails').modal("show");
+                    return false; // Required to stop modal window from hiding immediately
+                }
+            )))
+            .attr("data-toggle", "modal")
+            .attr("data-target", "#SoftwareDetails"));
+    }
 }
 
 function DeleteSoftware(title) {

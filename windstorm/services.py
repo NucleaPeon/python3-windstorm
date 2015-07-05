@@ -62,7 +62,7 @@ class Services(daemon.Daemon):
                 'depends': {
                     'services': [],
                     'files': [],
-                    'windstorms': []
+                    'windstorminstances': []
                 },
                 'testsuitegroup': "TestTestGroup"
             }

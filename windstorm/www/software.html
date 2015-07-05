@@ -35,10 +35,97 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <span id="modal-header-title">Title</span>
+                <span id="modal-header-title" style="font-size: 140%;">Title</span>
             </div>
-            <div class="modal-body">
-                Hello World
+            <div class="modal-body row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon">Files</span>
+                        <input id="numberoffiles" type="text" class="form-control" placeholder="Number Of Files" disabled="disabled" value="0"></input>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon">Project Size</span>
+                        <input id="projectsize" type="text" class="form-control" placeholder="Total File Size" disabled="disabled" value="0"></input>
+                        <span class="input-group-addon">Kb</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body row">
+                <div class="col-md-12">
+                    <div class="accordion" id="projectfilelisting">
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#projectfilelisting" href="#collapsepfl">
+                                Service Dependencies
+                            </a>
+                            </div>
+                            <div id="collapsepfl" class="accordion-body collapse in">
+                                <div class="accordion-inner" id="list_projectfiles">
+                                    <!-- Files go here if any are found -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                <br /><button type="button" class="btn btn-default col-md-12" onclick="alert('Add files');">Add Project Files/Folders</button></div>
+            </div>
+            <hr>
+            <!-- Dependencies -->
+            <!-- FIXME: Convert into accordians -->
+            <div class="modal-body row">
+                <div class="col-md-12">
+                    <div class="accordion" id="accordion2">
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                Service Dependencies
+                            </a> - 
+                            <a href="#">[+] Add Dependency</a>
+                            </div>
+                            <div id="collapseOne" class="accordion-body collapse in">
+                            <div class="accordion-inner">
+                                
+                            </div>
+                            </div>
+                        </div>
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                                File Dependencies
+                            </a> - 
+                            <a href="#">[+] Add Dependency</a>
+                            </div>
+                            <div id="collapseTwo" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                
+                            </div>
+                            </div>
+                        </div>
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+                                Windstorm Instances
+                            </a> - 
+                            <a href="#">[+] Add Dependency</a>
+                            </div>
+                            <div id="collapseThree" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                            
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="modal-body row">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="" id="SaveSoftwareBtn"><span class="glyphicon glyphicon-floppy-disk"></span> Accept</button>
+                </div>
             </div>
         </div>
     </div>
