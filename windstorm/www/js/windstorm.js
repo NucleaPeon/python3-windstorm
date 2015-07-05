@@ -22,4 +22,18 @@ function go_results() {
     window.location.replace("http://localhost:9090/results.html");
 }
 
-
+$(document).on("ready", function() {
+    $("#AddNewSoftware").on("shown.bs.modal", function() {
+        $('#mpname').focus();
+        var func = $(document).keypress(function(e) {
+            if(e.which == 13) {
+                $('#SaveSoftwareBtn').click();
+                $('#AddNewSoftware').modal("hide");
+            }
+        });
+    });
+    $("#AddNewSoftware").on("hidden.bs.modal", function() {
+        delete $(document).keypress();
+        $("#mpname").val();
+    });
+});

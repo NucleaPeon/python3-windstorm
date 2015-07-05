@@ -1,17 +1,10 @@
 function AddProject() {
     $("#AddNewSoftware").modal("show");
-    $("#AddNewSoftware").on("shown.bs.modal", function() {
-        $('#mpname').focus();
-        $(document).keypress(function(e) {
-            if(e.which == 13) {
-                $('#SaveSoftwareBtn').click();
-            }
-        });
-    });
 }
 
 function SaveProject() {
     if (($('#mpname').val() == "") || ($('#mpname').val() === undefined)) {
+        // Highlight the field in red background by adding in required class
         return undefined
     }
     var projname = $('#mpname').val();
@@ -23,7 +16,7 @@ function SaveProject() {
                     $('#Warn_NoProject').remove();
                }
                AppendProjectPanel(data.results.project.title);
-               $("#Messages").append($("<li>").addClass("list-group-item").html("..."));
+               $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.project.title));
            }
     );
     
@@ -46,7 +39,6 @@ function GetProjects(callback) {
 
 function DisplayProjects(projects) {
     for (var i=0; i < projects.results.length; i++) {
-        console.log("Displaying project " + i);
         AppendProjectPanel(projects.results[i]);
     }
     if (projects.results.length > 0) {
@@ -62,6 +54,7 @@ function DisplayProjects(projects) {
 }
 
 function AppendProjectPanel(title) {
+    // Check to ensure project doesn't already exist before appending it
     if ($('#' + title).length == 0) {
         $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
             .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
@@ -88,6 +81,7 @@ function DeleteSoftware(title) {
                if (project.results.deleted == "true") {
                    $('#' + title).remove();
                    GetProjects();
+                   $("#Messages").append($("<li>").addClass("list-group-item").html("Deleted project " + title));
                }
            });
 }
