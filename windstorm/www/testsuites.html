@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block supplimentaryjs %}
+    <script src="/js/windstorm-testsuites.js"></script>
 {% end %}
 {% block sidenav %}
     <li class="list-group-item" style="cursor:pointer;" onclick="go_home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</li>
@@ -10,10 +11,91 @@
     <li class="list-group-item" style="cursor:pointer;" onclick="go_about()"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</li>
 {% end %}
 
-{% block notifications %}
-<i>notifications go here</i>
-{% end %}
-
 {% block main_content %}
-main content goes here
+<div class="btn-group btn-group-sm" role="group" aria-label="SoftwareOptionBar">
+  <button type="button" class="btn btn-default" onclick="alert('Add test suite');"><span class="glyphicon glyphicon-plus"></span> Add</button>
+  <button type="button" class="btn btn-default" disabled="disabled" onclick="alert('Delete test suite');"><span class="glyphicon glyphicon-remove"></span> Delete</button>
+  <div class="btn-group btn-group-sm" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon-sort"></span> Sort By
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Name</a></li>
+      <li><a href="#"># of Test Cases</a></li>
+      <li><a href="#">Failures</a></li>
+      <li><a href="#">Successes</a></li>
+      <li><a href="#">Dependency: Files</a></li>
+      <li><a href="#">Dependency: Services</a></li>
+      <li><a href="#">Dependency: Windstorm</a></li>
+    </ul>
+  </div>
+  
+    <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="glyphicon glyphicon-filter"></span> Filter By
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+        </button>
+        <ul class="dropdown-menu">
+        <li><a href="#">Tests...</a></li>
+        <li><a href="#">Has Files</a></li>
+        <li><a href="#">Has Services</a></li>
+        <li><a href="#">Has Windstorm</a></li>
+        <li><a href="#">No Dependencies</a></li>
+        </ul>
+    </div>
+</div>
+<br /><br />
+<div class="panel panel-default testsuite" id="TestDiv">
+    <div class="panel-heading">
+        <div class="input-group">
+        <span class="input-group-addon">
+            <input class="checkbox" type="checkbox" aria-label="..." onclick='SelectTest("TestDiv");'>
+            <!-- On checkbox check, add panel-primary class. On uncheck, remove class -->
+        </span>
+        <input type="text" class="form-control" aria-label="..." placeholder="Test Suite Name">
+        </div><!-- /input-group -->
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <span class="badge">0</span>
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                    Test Entity (Unittest File?)
+                </a>&nbsp;
+                <div class="accordion" id="accordion2">
+                    <div class="accordion-group">
+                        <div id="collapseOne" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <!-- Contents here -->
+                                <center>
+                                     <span class="glyphicon glyphicon-plus"></span> Add &nbsp; <span class="glyphicon glyphicon-remove"></span> Delete
+                                </center>
+                                
+                                <table class="table">
+                                    <tr>
+                                        <td><input type="checkbox" aria-label="..."></td>
+                                        <td><code>Title</code></td>
+                                        <td>
+                                            
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                    </tr>
+                                </table>
+                                <!-- end -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
 {% end %}
