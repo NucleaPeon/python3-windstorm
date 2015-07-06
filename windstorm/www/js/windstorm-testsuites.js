@@ -15,6 +15,36 @@ $(document).on("ready", function() {
     });
 });
 
+function GetTestSuites(callback) {
+    $.post('http://localhost:9090/Services/GetTestSuites/',
+           {},
+           function(data) {
+             if (callback === undefined) {
+                 DisplaySuites(data); // remove all items from div then re-add
+             }
+             else {
+                 callback(data); // allow another method to handle returned projects
+             }
+           }
+    );
+}
+
+function DisplaySuites(projects) {
+    for (var i=0; i < projects.results.length; i++) {
+        AppendTestSuite(projects.results[i]);
+    }
+    if (projects.results.length > 0) {
+        $('#Warn_NoSuites').remove();
+    }
+    else {
+        if ($('#Warn_NoSuites').length == 0) {
+            $('#NotificationBlock').append(
+                '<div id="Warn_NoSuites" class="alert alert-warning" role="alert"><span class="glyphicon glyphicon-warning-sign"></span> No Test Suites found. <a href="#" onclick="AddTestSuite();">Click here to add one</a> </div>'
+            );
+        }
+    }
+}
+
 function SelectTest(testdivname) {
     var div = $('#' + testdivname);
     var divbox = div.find("input.checkbox")[0];
@@ -42,6 +72,7 @@ function DeleteTestSuites() {
     var suites = $('.testsuite-active');
     if (suites.length > 0) {
         suites.remove();
+        $('#DeleteTestSuites').prop("disabled", true);
     }
 }
 
@@ -50,55 +81,26 @@ function SaveTestSuite(testsuitename) {
 }
 
 function AppendTestSuite(testsuitename) {
-    if ($('#' + testsuitename).length == 0) {
-        /**
+    /**
         * 
+        <!-- Contents here -->
+        <center>
+            <span class="glyphicon glyphicon-plus"></span> Add &nbsp; <span class="glyphicon glyphicon-remove"></span> Delete
+        </center>
         
-        <div class="panel-heading">
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <input class="checkbox" type="checkbox" aria-label="..." onclick='SelectTest("TestDiv");'>
-                    <!-- On checkbox check, add panel-primary class. On uncheck, remove class -->
-                </span>
-                <input id="TestDivLbl" type="text" class="text form-control" aria-label="..." placeholder="Test Suite Name" disabled="disabled">
-            </div><!-- /input-group -->
-        </div>
-        <div class="panel-body">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <span class="badge">0</span>
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                        Test Entity (Unittest File?)
-                    </a>
-                    <div class="accordion" id="accordion2">
-                        <div class="accordion-group">
-                            <div id="collapseOne" class="accordion-body collapse">
-                                <div class="accordion-inner">
-                                    <!-- Contents here -->
-                                    <center>
-                                        <span class="glyphicon glyphicon-plus"></span> Add &nbsp; <span class="glyphicon glyphicon-remove"></span> Delete
-                                    </center>
-                                    
-                                    <table class="table">
-                                        <tr>
-                                            <td><input type="checkbox" aria-label="..."></td>
-                                            <td><code>Title</code></td>
-                                            <td>
-                                                
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                        </tr>
-                                    </table>
-                                    <!-- end -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <table class="table">
+            <tr>
+                <td><input type="checkbox" aria-label="..."></td>
+                <td><code>Title</code></td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+            </tr>
+        </table>
+        <!-- end -->
     **/
+    if ($('#' + testsuitename).length == 0) {
         $('#TestSuiteListing')
             .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
                 .append($("<div>").addClass("panel-heading")

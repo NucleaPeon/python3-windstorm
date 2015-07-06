@@ -84,6 +84,10 @@ class Services(daemon.Daemon):
         return list(self.projects.keys())
     
     @ServiceParams
+    def GetTestSuites(self, **kwargs):
+        return list(self.testsuites.keys())
+    
+    @ServiceParams
     def SaveProject(self, project=None, **kwargs):
         self.projects[project['title']] = project
         return dict(project=self.projects[project['title']])

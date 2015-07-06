@@ -79,3 +79,9 @@
   </div>
 </div>
 {% end %}
+
+{% block customjs %}
+$(document).ready( function() {
+    GetTestSuites();
+});
+{% end %}
