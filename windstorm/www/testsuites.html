@@ -13,7 +13,7 @@
 
 {% block main_content %}
 <div class="btn-group btn-group-sm" role="group" aria-label="SoftwareOptionBar">
-  <button type="button" class="btn btn-default" onclick="alert('Add test suite');"><span class="glyphicon glyphicon-plus"></span> Add</button>
+  <button type="button" class="btn btn-default" onclick="AddTestSuite();"><span class="glyphicon glyphicon-plus"></span> Add</button>
   <button type="button" class="btn btn-default" disabled="disabled" id="DeleteTestSuites" onclick="alert('Delete test suite');"><span class="glyphicon glyphicon-remove"></span> Delete</button>
   <div class="btn-group btn-group-sm" role="group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -52,50 +52,29 @@
     </div>
 </div>
 <br /><br />
-<div class="panel panel-default testsuite" id="TestDiv">
-    <div class="panel-heading">
+<div id="TestSuiteListing">
+</div>
+
+<div id="AddTestSuite" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add Test Suite</h4>
+      </div>
+      <div class="modal-body">
         <div class="input-group">
-        <span class="input-group-addon">
-            <input class="checkbox" type="checkbox" aria-label="..." onclick='SelectTest("TestDiv");'>
-            <!-- On checkbox check, add panel-primary class. On uncheck, remove class -->
-        </span>
-        <input type="text" class="form-control" aria-label="..." placeholder="Test Suite Name">
-        </div><!-- /input-group -->
+            <span class="input-group-addon" id="project_title">Name</span>
+            <input id="tsname" type="text" class="form-control" placeholder="Test Suite Name" aria-describedby="testsuite_name"><br />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="SaveTestSuite" onclick="SaveTestSuite();"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+      </div>
     </div>
-    <div class="panel-body">
-        <ul class="list-group">
-            <li class="list-group-item">
-                <span class="badge">0</span>
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                    Test Entity (Unittest File?)
-                </a>&nbsp;
-                <div class="accordion" id="accordion2">
-                    <div class="accordion-group">
-                        <div id="collapseOne" class="accordion-body collapse">
-                            <div class="accordion-inner">
-                                <!-- Contents here -->
-                                <center>
-                                     <span class="glyphicon glyphicon-plus"></span> Add &nbsp; <span class="glyphicon glyphicon-remove"></span> Delete
-                                </center>
-                                
-                                <table class="table">
-                                    <tr>
-                                        <td><input type="checkbox" aria-label="..."></td>
-                                        <td><code>Title</code></td>
-                                        <td>
-                                            
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                    </tr>
-                                </table>
-                                <!-- end -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
+
+  </div>
 </div>
 {% end %}

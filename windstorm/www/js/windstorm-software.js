@@ -10,7 +10,7 @@ $(document).on("ready", function() {
     });
     $("#AddNewSoftware").on("hidden.bs.modal", function() {
         delete $(document).keypress();
-        $("#mpname").val();
+        $("#mpname").val("");
     });
 });
 
