@@ -20,7 +20,7 @@ function GetTestSuites(callback) {
            {},
            function(data) {
              if (callback === undefined) {
-                 DisplaySuites(data); // remove all items from div then re-add
+                 DisplaySuites(data.results); // remove all items from div then re-add
              }
              else {
                  callback(data); // allow another method to handle returned projects
@@ -29,11 +29,12 @@ function GetTestSuites(callback) {
     );
 }
 
-function DisplaySuites(projects) {
-    for (var i=0; i < projects.results.length; i++) {
-        AppendTestSuite(projects.results[i]);
+function DisplaySuites(suites) {
+    var suitelbls = Object.keys(suites);
+    for (var i=0; i < suitelbls.length; i++) {
+        AppendTestSuite(suitelbls[i]);
     }
-    if (projects.results.length > 0) {
+    if (suitelbls.length > 0) {
         $('#Warn_NoSuites').remove();
     }
     else {
@@ -70,9 +71,22 @@ function AddTestSuite() {
 
 function DeleteTestSuites() {
     var suites = $('.testsuite-active');
-    if (suites.length > 0) {
+    var suitelbls = []
+    
+    for (var i=0; i < suites.length; i++)  {
+        suitelbls.push(suites[i].id);
+    }
+    console.log(suitelbls);
+    if (suitelbls.length > 0) {
+        jQuery.ajaxSettings.traditional = true;
+        $.post('http://localhost:9090/Services/DeleteTestSuites/',
+           {"suites": ["Test"]},
+           function(data) {
+               console.log(data);
+           });
         suites.remove();
         $('#DeleteTestSuites').prop("disabled", true);
+        GetTestSuites();
     }
 }
 

@@ -23,16 +23,6 @@ try:
 except ImportError as iE:
     import daemon as daemon
 
-def ServiceParams(func):
-    def encodeparams(self, *args, **kwargs):
-        newkw = { x: [json.loads(z.decode('utf-8')) for z in y] for x, y in kwargs.items() }
-        for k, v in newkw.items():
-            newkw[k] = v[0]
-            
-        return func(self, **newkw)
-
-    return encodeparams
-
 class Services(daemon.Daemon):
     
     class Routes(tornado.web.RequestHandler):
@@ -79,20 +69,35 @@ class Services(daemon.Daemon):
         server.listen(9091, address='localhost')
         tornado.ioloop.IOLoop.current().start()
         
-    @ServiceParams
+    
     def GetProjects(self, **kwargs):
         return list(self.projects.keys())
     
-    @ServiceParams
-    def GetTestSuites(self, **kwargs):
-        return list(self.testsuites.keys())
     
-    @ServiceParams
+    def GetTestSuites(self, **kwargs):
+        return self.testgroups
+    
+    
+    def DeleteTestSuites(self, suites=None, **kwargs):
+        deltests = []
+        print(kwargs)
+        for s in suites:
+            s = s.decode('utf-8')
+            if not s in self.testgroups:
+                continue
+                
+            else:
+                del self.testgroups[s]
+                deltests.append(s)
+            
+        return dict(deleted=deltests)
+    
+    
     def SaveProject(self, project=None, **kwargs):
         self.projects[project['title']] = project
         return dict(project=self.projects[project['title']])
     
-    @ServiceParams
+    
     def DeleteProject(self, title=None, **kwargs):
         retval = False
         if title in self.projects:
@@ -102,7 +107,6 @@ class Services(daemon.Daemon):
         return dict(deleted=json.dumps(retval))
     
 def start(pidfile):
-
     try:    
         pid = os.fork()
 
