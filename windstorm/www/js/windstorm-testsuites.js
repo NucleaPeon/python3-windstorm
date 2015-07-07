@@ -137,24 +137,28 @@ function GetProjects() {
                                         .append($("<span>").html(data.results[i]))
                                     )
                                     .append($("<span>").addClass("input-group-addon")
-                                        .append("<span>").addClass("btn btn-default").attr("refid", "pb" + data.results[i]).html("Display Tests")
+                                        .append("<span>").addClass("btn btn-sm btn-default").attr("refid", "pb" + data.results[i]).html("Display Tests")
                                         .on("click", function() {
                                             //$('#ProjectSelect').modal("hide");
                                             if ($('#bar' + $(this).attr("refid")).length < 1) {
-                                                $('#' + $(this).attr("refid")).append(
-                                                    $("<div>").addClass("progress")
+                                                $('#' + $(this).attr("refid"))
+                                                    .append($("<br>"))
+                                                    .append($("<div>").addClass("progress")
                                                         .append($("<div>").addClass("progress-bar progress-bar-info progress-bar-striped active")
                                                             .attr({"role": "progressbar", "aria-valuenow": "100", "aria-valuemin": "0", "aria-valuemax": "100",
                                                                 "style": "width: 100%;"})
                                                                 .append($("<b>").html("Hello").attr("id", "txt" + $(this).attr("refid")))
                                                             .append($("<span>").addClass("sr-only").html("0%").attr("id", "bar" + $(this).attr("refid")))
                                                         )
-                                                );
-                                            }                                            
+                                                    );
+                                            }
                                         })
                                     )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<span>").addClass("badge").html(0))
+                                    )
                                 )
-                            ).append($("<br>"))
+                            )
                             .append($("<div>").attr("id", "pb" + data.results[i]).addClass("progressbar"));
                     }
                 }
