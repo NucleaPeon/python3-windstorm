@@ -80,7 +80,7 @@ function DeleteTestSuites() {
     if (suitelbls.length > 0) {
         jQuery.ajaxSettings.traditional = true;
         $.post('http://localhost:9090/Services/DeleteTestSuites/',
-           {"suites": ["Test"]},
+           {"suites": suitelbls},
            function(data) {
                console.log(data);
            });
@@ -92,6 +92,18 @@ function DeleteTestSuites() {
 
 function SaveTestSuite(testsuitename) {
     AppendTestSuite(testsuitename);
+}
+
+function Upload(testsuitename) {
+    alert("Upload file/folder " + $('#upload' + testsuitename).val());
+}
+
+function FileBrowseNotify(testsuitename, filefoldername) {
+    alert("Please drag and drop your file or folder into the text input");
+}
+
+function GenerateTestTable(testsuitename) {
+    return $("<br>");
 }
 
 function AppendTestSuite(testsuitename) {
@@ -138,16 +150,31 @@ function AppendTestSuite(testsuitename) {
                     .append($("<ul>").addClass("list-group")
                         .append($("<li>").addClass("list-group-item")
                             .append($("<span>").addClass("badge").html(0))
+                            .append($("<span>").addClass("glyphicon glyphicon-tasks").html("&nbsp;"))
                             .append($("<a>").addClass("accordion-toggle").attr({
                                 "data-parent": "#accordion2",
                                 "data-toggle": "collapse",
                                 "href": "#collapseOne"
-                            }).html("Test Entity (Unittest File?)")).append("&nbsp;")
+                            }).html('Test Listings ')).append("&nbsp; &nbsp;").append($("<div>").addClass("btn-group").attr("role", "group")
+                                .append($("<div>").addClass("input-group")
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<input>").addClass("checkbox").attr({
+                                                "type": "checkbox",
+                                                "aria-label": "...",
+                                                "id": "update" + testsuitename
+                                            })
+                                        )
+                                    )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<span>").html("Update Tests on Run"))
+                                    )
+                                )
+                            )
                             .append($("<div>").addClass("accordion").attr("id", "accordion2")
                                 .append($("<div>").addClass("accordion-group")
                                     .append($("<div>").addClass("accordion-body collapse").attr("id", "collapseOne")
                                         .append($("<div>").addClass("accordion-inner")
-                                            .append("<span>Hello World!</span>")
+                                            .append(GenerateTestTable(testsuitename))
                                         )
                                     )
                                 )

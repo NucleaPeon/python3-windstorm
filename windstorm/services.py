@@ -80,7 +80,6 @@ class Services(daemon.Daemon):
     
     def DeleteTestSuites(self, suites=None, **kwargs):
         deltests = []
-        print(kwargs)
         for s in suites:
             s = s.decode('utf-8')
             if not s in self.testgroups:

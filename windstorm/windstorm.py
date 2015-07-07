@@ -169,8 +169,6 @@ if __name__ == "__main__":
         args.stop = True
         args.start = True
     
-    
-    
     pidfile = os.path.join(os.sep, 'var', 'run', 'ws-services.pid')
     try:
         # Predetermine if permissions are OK
