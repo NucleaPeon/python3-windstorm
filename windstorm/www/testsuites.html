@@ -94,6 +94,20 @@
         </div>
         <div id="projectlisting">
         </div>
+        <div id="misctestuploader">
+            <div class="input-group">
+                <span class="input-group-addon" id="project_title">Test Uploader</span>
+                <input id="testdnd" type="text" class="form-control" placeholder="Drop Tests Here" aria-describedby="upload_tests"
+                       ondrop="droptest(event);" ondragover="allowDrop(event)">
+                <span class="input-group-addon btn btn-default" id="project_title" onclick="UploaderSettings();">
+                    <span class="glyphicon glyphicon-cog" id="testuploadsettings"></span>
+                </span>
+            </div>
+            <div id="misctestprogressbar" class="hidden">
+            </div>
+        </div>
+        <div id="misctestlisting">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
@@ -108,4 +122,13 @@
 $(document).ready( function() {
     GetTestSuites();
 });
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function droptest(event, a, b, c) {
+    event.preventDefault();
+    var data = event.dataTransfer.getData("text");
+    console.log(data.split("\n"));
+}
 {% end %}

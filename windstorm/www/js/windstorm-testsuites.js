@@ -12,6 +12,10 @@ $(document).on("ready", function() {
     $("#ProjectSelect").on("shown.bs.modal", function() {
         GetProjects();
         $('#projectloadergif').addClass("hidden");
+        
+    });
+    $("#ProjectSelect").on("hidden.bs.modal", function() {
+        $('.progressbar').empty()
     });
     
     $("#AddTestSuite").on("hidden.bs.modal", function() {
@@ -140,25 +144,18 @@ function GetProjects() {
                                                 $('#' + $(this).attr("refid")).append(
                                                     $("<div>").addClass("progress")
                                                         .append($("<div>").addClass("progress-bar progress-bar-info progress-bar-striped active")
-                                                            .attr({"role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0", "aria-valuemax": "100",
-                                                                "style": "width: 20%"})
-                                                            .append($("<span>").addClass("sr-only").append("Progress Bar").attr("id", "bar" + $(this).attr("refid")))
+                                                            .attr({"role": "progressbar", "aria-valuenow": "100", "aria-valuemin": "0", "aria-valuemax": "100",
+                                                                "style": "width: 100%;"})
+                                                                .append($("<b>").html("Hello").attr("id", "txt" + $(this).attr("refid")))
+                                                            .append($("<span>").addClass("sr-only").html("0%").attr("id", "bar" + $(this).attr("refid")))
                                                         )
                                                 );
-                                            }
-                                            
-                                            /**<div class="progress">
-  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
-    <span class="sr-only">20% Complete</span>
-  </div>
-</div>**/
-                                            
-                                            
+                                            }                                            
                                         })
                                     )
                                 )
                             ).append($("<br>"))
-                            .append($("<div>").attr("id", "pb" + data.results[i]));
+                            .append($("<div>").attr("id", "pb" + data.results[i]).addClass("progressbar"));
                     }
                 }
             }
@@ -249,4 +246,7 @@ function AppendTestSuite(testsuitename) {
                 )
             );
     }
+}
+
+function UploaderSettings() {
 }
