@@ -117,28 +117,49 @@ function GetProjects() {
            {},
            function(data) {
                for (var i=0; i<data.results.length; i++) {
-                    $("#projectlisting")
-                        .append($("<div>")
-                            .append($("<div>").addClass("input-group")
-                                .append($("<span>").addClass("input-group-addon")
-                                    .append($("<input>").addClass("checkbox").attr({
-                                            "type": "checkbox",
-                                            "aria-label": "...",
-                                            "id": "include" + data.results[i]
+                   if ($('#' + data.results[i]).length == 0) {
+                        $("#projectlisting")
+                            .append($("<div>").attr("id", data.results[i])
+                                .append($("<div>").addClass("input-group")
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<input>").addClass("checkbox").attr({
+                                                "type": "checkbox",
+                                                "aria-label": "...",
+                                                "id": "include" + data.results[i]
+                                            })
+                                        )
+                                    )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<span>").html(data.results[i]))
+                                    )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append("<span>").addClass("btn btn-default").attr("refid", "pb" + data.results[i]).html("Display Tests")
+                                        .on("click", function() {
+                                            //$('#ProjectSelect').modal("hide");
+                                            if ($('#bar' + $(this).attr("refid")).length < 1) {
+                                                $('#' + $(this).attr("refid")).append(
+                                                    $("<div>").addClass("progress")
+                                                        .append($("<div>").addClass("progress-bar progress-bar-info progress-bar-striped active")
+                                                            .attr({"role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0", "aria-valuemax": "100",
+                                                                "style": "width: 20%"})
+                                                            .append($("<span>").addClass("sr-only").append("Progress Bar").attr("id", "bar" + $(this).attr("refid")))
+                                                        )
+                                                );
+                                            }
+                                            
+                                            /**<div class="progress">
+  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+    <span class="sr-only">20% Complete</span>
+  </div>
+</div>**/
+                                            
+                                            
                                         })
                                     )
                                 )
-                                .append($("<span>").addClass("input-group-addon")
-                                    .append($("<span>").html(data.results[i]))
-                                )
-                                .append($("<span>").addClass("input-group-addon")
-                                    .append("<span>").addClass("btn btn-default").html("Display Tests")
-                                    .on("click", function() {
-                                        $('#ProjectSelect').modal("hide");
-                                    })
-                                )
-                            )
-                        ).append($("<br>").attr("id", "br" + data.results[i]));
+                            ).append($("<br>"))
+                            .append($("<div>").attr("id", "pb" + data.results[i]));
+                    }
                 }
             }
     );
