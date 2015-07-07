@@ -9,6 +9,11 @@ $(document).on("ready", function() {
             }
         });
     });
+    $("#ProjectSelect").on("shown.bs.modal", function() {
+        GetProjects();
+        $('#projectloadergif').addClass("hidden");
+    });
+    
     $("#AddTestSuite").on("hidden.bs.modal", function() {
         delete $(document).keypress();
         $("#tsname").val("");
@@ -103,7 +108,40 @@ function FileBrowseNotify(testsuitename, filefoldername) {
 }
 
 function GenerateTestTable(testsuitename) {
-    return $("<br>");
+    return "<br>";
+}
+
+function GetProjects() {
+    // Return all projects, or display notification that no projects exist
+    $.post('http://localhost:9090/Services/GetProjects/',
+           {},
+           function(data) {
+               for (var i=0; i<data.results.length; i++) {
+                    $("#projectlisting")
+                        .append($("<div>")
+                            .append($("<div>").addClass("input-group")
+                                .append($("<span>").addClass("input-group-addon")
+                                    .append($("<input>").addClass("checkbox").attr({
+                                            "type": "checkbox",
+                                            "aria-label": "...",
+                                            "id": "include" + data.results[i]
+                                        })
+                                    )
+                                )
+                                .append($("<span>").addClass("input-group-addon")
+                                    .append($("<span>").html(data.results[i]))
+                                )
+                                .append($("<span>").addClass("input-group-addon")
+                                    .append("<span>").addClass("btn btn-default").html("Display Tests")
+                                    .on("click", function() {
+                                        $('#ProjectSelect').modal("hide");
+                                    })
+                                )
+                            )
+                        ).append($("<br>").attr("id", "br" + data.results[i]));
+                }
+            }
+    );
 }
 
 function AppendTestSuite(testsuitename) {
@@ -167,6 +205,12 @@ function AppendTestSuite(testsuitename) {
                                     )
                                     .append($("<span>").addClass("input-group-addon")
                                         .append($("<span>").html("Update Tests on Run"))
+                                    )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append("<span>").addClass("btn btn-default").html("Add Tests From...")
+                                        .on("click", function() {
+                                            $('#ProjectSelect').modal("show");
+                                        })
                                     )
                                 )
                             )
