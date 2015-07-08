@@ -54,7 +54,7 @@ class Services(daemon.Daemon):
         self.projects = {
             'TestProject' : {
                 'title': "TestProject",
-                'files': [],
+                'paths': ['/tmp/'],
                 'depends': {
                     'services': [],
                     'files': [],
@@ -80,8 +80,9 @@ class Services(daemon.Daemon):
     
     def GetProjectPathsByName(self, name=None, **kwargs):
         if not name is None:
+            name = name[0].decode('utf-8')
             if not self.projects.get(name) is None:
-                return self.projects[name]["files"]
+                return self.projects[name]["paths"]
             
         return []
     
@@ -122,7 +123,7 @@ class Services(daemon.Daemon):
         if not plugin is None:
             plugin = plugin[0].decode('utf-8')
             
-        logging.info(plugin)
+        logging.info(path)
         loadedtests = []
         
         if path is None:
@@ -136,11 +137,12 @@ class Services(daemon.Daemon):
         try:
             mod = importlib.import_module(plugin)
             loadedtests = mod.find(path)
+            logging.info(loadedtests)
             
         except:
             logging.error("Module failed to import, plugin {}".format(plugin))
         
-        return 
+        return loadedtests
     
     def GetListOfPlugins(self, **kwargs):
         logging.info("GetListOfPlugins from directory {}".format(os.getcwd()))

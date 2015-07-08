@@ -120,24 +120,28 @@ function GetProjects() {
     $.post('http://localhost:9090/Services/GetProjects/',
            {},
            function(data) {
+               jQuery.ajaxSettings.traditional = true;
                for (var i=0; i<data.results.length; i++) {
+                   var name = data.results[i];
                    if ($('#' + data.results[i]).length == 0) {
                         $("#projectlisting")
-                            .append($("<div>").attr("id", data.results[i])
+                            .append($("<div>").attr("id", name)
                                 .append($("<div>").addClass("input-group")
                                     .append($("<span>").addClass("input-group-addon")
                                         .append($("<input>").addClass("checkbox").attr({
                                                 "type": "checkbox",
                                                 "aria-label": "...",
-                                                "id": "include" + data.results[i]
+                                                "id": "include" + name
                                             })
                                         )
                                     )
                                     .append($("<span>").addClass("input-group-addon")
-                                        .append($("<span>").html(data.results[i]))
+                                        .append($("<span>").html(name))
                                     )
                                     .append($("<span>").addClass("input-group-addon")
-                                        .append("<span>").addClass("btn btn-sm btn-default").attr("refid", "pb" + data.results[i]).html("Update Test Listing")
+                                        .append("<span>").addClass("btn btn-sm btn-default").attr({"refid": "pb" + name,
+                                            "project": name})
+                                        .html("Update Test Listing")
                                         .on("click", function() {
                                             //$('#ProjectSelect').modal("hide");
                                             if ($('#bar' + $(this).attr("refid")).length < 1) {
@@ -151,33 +155,32 @@ function GetProjects() {
                                                             .append($("<span>").addClass("sr-only").html("0%").attr("id", "bar" + $(this).attr("refid")))
                                                         )
                                                     );
-                                                var name = data.results[i];
                                                 var refid = '#' + $(this).attr("refid");
                                                 var plugin = "TestsByFilename";
-                                                //
                                                 $.ajax({
                                                     type: "POST",
                                                     url: 'http://localhost:9090/Services/GetProjectPathsByName/',
                                                     data: {name: name},
-                                                    success: function(data) {
-                                                        console.log(data.results);
+                                                    success: function(projpaths) {
+                                                        var paths = projpaths.results;
+                                                        console.log(paths);
+                                                        $.ajax({
+                                                            type: "POST",
+                                                            url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
+                                                            data: {
+                                                                plugin: plugin,
+                                                                path: projpaths.results 
+                                                            },
+                                                            success: function(data) {
+                                                                console.log(data.results);
+                                                            },
+                                                            dataType: "json"
+                                                        }).done(function(data) {
+                                                            console.log(data);
+                                                            $(refid).empty();
+                                                        });
                                                     },
                                                     dataType: "json"
-                                                }).done(function(data) {
-                                                    $.ajax({
-                                                        type: "POST",
-                                                        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
-                                                        data: {
-                                                            plugin: plugin,
-                                                            path: ""
-                                                        },
-                                                        success: function(data) {
-                                                            console.log(data.results);
-                                                        },
-                                                        dataType: "json"
-                                                    }).done(function(data) {
-                                                        $(refid).empty();
-                                                    });
                                                 });
                                             }
                                             console.log("Display Tests Button Clicked");
@@ -189,7 +192,7 @@ function GetProjects() {
                                     )
                                 )
                             )
-                            .append($("<div>").attr("id", "pb" + data.results[i]).addClass("progressbar"));
+                            .append($("<div>").attr("id", "pb" + name).addClass("progressbar"));
                     }
                 }
             }
@@ -317,5 +320,19 @@ function LoadTestsByPlugin() {
             console.log(data.results);
         },
         dataType: "json"
+    });
+}
+
+function GetProjectPathsByName(name) {
+    console.log(name);
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/GetProjectPathsByName/',
+        data: {name: name},
+        success: function(projpaths) {
+            console.log(projpaths.results);
+        },
+        dataType: "json"
+    }).done(function(data) {
     });
 }
