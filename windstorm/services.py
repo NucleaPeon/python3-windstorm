@@ -48,6 +48,8 @@ class Services(daemon.Daemon):
     def __init__(self, pidfile):
         super().__init__(self)
         self.pidfile = pidfile
+        # Add plugins directory
+        sys.path.insert(0, os.path.join(os.getcwd(), "plugins.d"))
         # Information Cache:
         self.projects = {
             'TestProject' : {
@@ -76,6 +78,13 @@ class Services(daemon.Daemon):
     def GetProjects(self, **kwargs):
         return list(self.projects.keys())
     
+    def GetProjectPathsByName(self, name=None, **kwargs):
+        if not name is None:
+            if not self.projects.get(name) is None:
+                return self.projects[name]["files"]
+            
+        return []
+    
     def GetTestSuites(self, **kwargs):
         return self.testgroups
     
@@ -93,10 +102,15 @@ class Services(daemon.Daemon):
         return dict(deleted=deltests)
     
     def SaveProject(self, project=None, **kwargs):
+        if not project is None:
+            project = project.decode('utf-8')
+            
         self.projects[project['title']] = project
         return dict(project=self.projects[project['title']])
     
     def DeleteProject(self, title=None, **kwargs):
+        if not title is None:
+            title = title.decode('utf-8')
         retval = False
         if title in self.projects:
             del self.projects[title]
@@ -104,19 +118,40 @@ class Services(daemon.Daemon):
             
         return dict(deleted=json.dumps(retval))
     
-    def LoadTestsByPlugin(self, plugin=None, **kwargs):
-        if plugin is None:
-            # Use default plugin
-            plugin = "TestByFilename"
+    def LoadTestsByPlugin(self, plugin=None, path=None, **kwargs):    
+        if not plugin is None:
+            plugin = plugin[0].decode('utf-8')
             
-        return []
+        logging.info(plugin)
+        loadedtests = []
+        
+        if path is None:
+            logging.warning("No path supplied")
+            return loadedtests
+        
+        if not plugin in self.GetListOfPlugins():
+            logging.warning("Not found in list of plugins")
+            return loadedtests # empty
+        
+        try:
+            mod = importlib.import_module(plugin)
+            loadedtests = mod.find(path)
+            
+        except:
+            logging.error("Module failed to import, plugin {}".format(plugin))
+        
+        return 
     
     def GetListOfPlugins(self, **kwargs):
         logging.info("GetListOfPlugins from directory {}".format(os.getcwd()))
-        for root, dirs, files in os.walk(os.getcwd()):
-            logging.info("Files {}".format(files))
+        plugins = []
+        for root, dirs, files in os.walk(os.path.join(os.getcwd(), "plugins.d")):
+            for f in files:
+                if f[-3:] == ".py":
+                    plugins.append(f[:-3])
+                    logging.info("\t{}".format(f[:-3]))
             
-        return [""]
+        return plugins
     
 def start(pidfile, in_dir="/"):
     try:    

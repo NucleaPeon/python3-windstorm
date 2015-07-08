@@ -137,7 +137,7 @@ function GetProjects() {
                                         .append($("<span>").html(data.results[i]))
                                     )
                                     .append($("<span>").addClass("input-group-addon")
-                                        .append("<span>").addClass("btn btn-sm btn-default").attr("refid", "pb" + data.results[i]).html("Display Tests")
+                                        .append("<span>").addClass("btn btn-sm btn-default").attr("refid", "pb" + data.results[i]).html("Update Test Listing")
                                         .on("click", function() {
                                             //$('#ProjectSelect').modal("hide");
                                             if ($('#bar' + $(this).attr("refid")).length < 1) {
@@ -147,11 +147,41 @@ function GetProjects() {
                                                         .append($("<div>").addClass("progress-bar progress-bar-info progress-bar-striped active")
                                                             .attr({"role": "progressbar", "aria-valuenow": "100", "aria-valuemin": "0", "aria-valuemax": "100",
                                                                 "style": "width: 100%;"})
-                                                                .append($("<b>").html("Hello").attr("id", "txt" + $(this).attr("refid")))
+                                                                .append($("<b>").html("Searching...").attr("id", "txt" + $(this).attr("refid")))
                                                             .append($("<span>").addClass("sr-only").html("0%").attr("id", "bar" + $(this).attr("refid")))
                                                         )
                                                     );
+                                                var name = data.results[i];
+                                                var refid = '#' + $(this).attr("refid");
+                                                var plugin = "TestsByFilename";
+                                                //
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: 'http://localhost:9090/Services/GetProjectPathsByName/',
+                                                    data: {name: name},
+                                                    success: function(data) {
+                                                        console.log(data.results);
+                                                    },
+                                                    dataType: "json"
+                                                }).done(function(data) {
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
+                                                        data: {
+                                                            plugin: plugin,
+                                                            path: ""
+                                                        },
+                                                        success: function(data) {
+                                                            console.log(data.results);
+                                                        },
+                                                        dataType: "json"
+                                                    }).done(function(data) {
+                                                        $(refid).empty();
+                                                    });
+                                                });
                                             }
+                                            console.log("Display Tests Button Clicked");
+                                            
                                         })
                                     )
                                     .append($("<span>").addClass("input-group-addon")
@@ -261,6 +291,28 @@ function GetListOfPlugins() {
         type: "POST",
         url: 'http://localhost:9090/Services/GetListOfPlugins/',
         data: {},
+        success: function(data) {
+            console.log(data.results);
+        },
+        dataType: "json"
+    });
+}
+
+function LoadTestsByPlugin() {
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
+        data: {},
+        success: function(data) {
+            console.log(data.results);
+        },
+        dataType: "json"
+    });
+    
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
+        data: {plugin: "TestsByFilename"},
         success: function(data) {
             console.log(data.results);
         },
