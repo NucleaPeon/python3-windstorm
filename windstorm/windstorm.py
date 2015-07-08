@@ -128,7 +128,7 @@ class Windstorm(daemon.Daemon):
         
         tornado.ioloop.IOLoop.current().start()
     
-def start(pidfile):
+def start(pidfile, in_dir="/"):
 
     try:    
         pid = os.fork()
@@ -137,7 +137,7 @@ def start(pidfile):
         sys.exit(1)
 
     if pid == 0:
-        Windstorm(pidfile, os.path.join(os.getcwd(), 'www')).start()
+        Windstorm(pidfile, os.path.join(os.getcwd(), 'www')).start(in_dir=in_dir)
             
 def stop(pidfile):
     pfile = open(pidfile, 'r')
@@ -184,7 +184,7 @@ if __name__ == "__main__":
             services.stop(pidfile)
         
     if args.start:
-        services.start(pidfile)
+        services.start(pidfile, in_dir=os.getcwd())
     
     
     pidfile = os.path.join(os.sep, 'var', 'run', 'windstorm.pid')
@@ -202,4 +202,4 @@ if __name__ == "__main__":
             stop(pidfile)
         
     if args.start:
-        start(pidfile)
+        start(pidfile, in_dir=os.getcwd())

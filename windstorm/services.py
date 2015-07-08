@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import signal
 import logging
+logging.basicConfig(level=logging.INFO)
 import mimetypes
 import json
 import inspect
+import importlib
 try:
     import tornado
     import tornado.web
@@ -68,15 +72,12 @@ class Services(daemon.Daemon):
         server = HTTPServer(self.application)
         server.listen(9091, address='localhost')
         tornado.ioloop.IOLoop.current().start()
-        
     
     def GetProjects(self, **kwargs):
         return list(self.projects.keys())
     
-    
     def GetTestSuites(self, **kwargs):
         return self.testgroups
-    
     
     def DeleteTestSuites(self, suites=None, **kwargs):
         deltests = []
@@ -91,11 +92,9 @@ class Services(daemon.Daemon):
             
         return dict(deleted=deltests)
     
-    
     def SaveProject(self, project=None, **kwargs):
         self.projects[project['title']] = project
         return dict(project=self.projects[project['title']])
-    
     
     def DeleteProject(self, title=None, **kwargs):
         retval = False
@@ -105,7 +104,21 @@ class Services(daemon.Daemon):
             
         return dict(deleted=json.dumps(retval))
     
-def start(pidfile):
+    def LoadTestsByPlugin(self, plugin=None, **kwargs):
+        if plugin is None:
+            # Use default plugin
+            plugin = "TestByFilename"
+            
+        return []
+    
+    def GetListOfPlugins(self, **kwargs):
+        logging.info("GetListOfPlugins from directory {}".format(os.getcwd()))
+        for root, dirs, files in os.walk(os.getcwd()):
+            logging.info("Files {}".format(files))
+            
+        return [""]
+    
+def start(pidfile, in_dir="/"):
     try:    
         pid = os.fork()
 
@@ -113,7 +126,7 @@ def start(pidfile):
         sys.exit(1)
 
     if pid == 0:
-        Services(pidfile).start()
+        Services(pidfile).start(in_dir=in_dir)
             
 def stop(pidfile):
     pfile = open(pidfile, 'r')

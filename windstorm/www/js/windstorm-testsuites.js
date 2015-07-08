@@ -253,4 +253,17 @@ function AppendTestSuite(testsuitename) {
 }
 
 function UploaderSettings() {
+    console.log("TODO");
+}
+
+function GetListOfPlugins() {
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/GetListOfPlugins/',
+        data: {},
+        success: function(data) {
+            console.log(data.results);
+        },
+        dataType: "json"
+    });
 }

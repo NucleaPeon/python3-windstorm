@@ -30,7 +30,7 @@ class Daemon(object):
 
         return pid
 
-    def daemonize(self):
+    def daemonize(self, in_dir="/"):
         """
         do the UNIX double-fork magic, see Stevens' "Advanced
         Programming in the UNIX Environment" for details (ISBN 0201563177)
@@ -53,7 +53,7 @@ class Daemon(object):
                 raise Exception("{} [{}]".format(e.strerror, e.errno))
 
             if pid == 0:
-                os.chdir("/")
+                os.chdir(in_dir)
                 os.umask(0)
                 # Event Loop Here
                 with open(self.pidfile, 'w') as f:
@@ -83,7 +83,7 @@ class Daemon(object):
             except OSError:   # ERROR, fd wasn't open to begin with (ignored)
                 pass
 
-    def start(self):
+    def start(self, in_dir="/"):
         """
         Start the daemon
         """
@@ -93,7 +93,7 @@ class Daemon(object):
             sys.exit(1)
 
         # Start the daemon
-        self.daemonize()
+        self.daemonize(in_dir=in_dir)
 
     def stop(self):
         """
