@@ -64,8 +64,15 @@ class Services(daemon.Daemon):
                 'testsuitegroup': "TestTestGroup"
             }
         }
-        self.testsuites = {'TestTestSuite': {}}
-        self.testgroups = {'TestTestGroup': ['TestTestSuite']}
+        self.testsuites = {
+            'TestTestSuite': {
+                "projects": ["TestProject"],
+                "additional": {}
+            }
+        }
+        self.testgroups = {
+            'TestTestGroup': ['TestTestSuite']
+        }
         
         self.application = tornado.web.Application([
             (r"/(.*)/", self.Routes, {"service": self}),
@@ -163,6 +170,26 @@ class Services(daemon.Daemon):
                     logging.info("\t{}".format(f[:-3]))
             
         return plugins
+    
+    def GetTestsBySuiteName(self, suite=None, **kwargs):
+        # Returns {project: [], additional: {}}
+        if not suite is None:
+            suite = suite[0].decode('utf-8')
+            if suite in self.testsuites:
+                return self.testsuites[suite]
+            
+        return {}
+    
+    def GetTestsByGroupName(self, group=None, **kwargs):
+        # Returns {suite: {project: [], additional: {}}}
+        tests = {}
+        if not group is None:
+            group = group[0].decode('utf-8')
+            if group in self.testgroups:
+                for suite in self.testgroups[group]:
+                    tests[suite] = self.testsuites[suite]
+            
+        return tests
     
 def start(pidfile, in_dir="/"):
     try:    
