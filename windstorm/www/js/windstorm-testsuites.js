@@ -16,7 +16,7 @@ $(document).on("ready", function() {
     });
     $("#ProjectSelect").on("hidden.bs.modal", function() {
         $('.progressbar').empty()
-        delete $('#accept_ts_btn').click();
+        $('#accept_ts_btn').off("click");
     });
     
     $("#AddTestSuite").on("hidden.bs.modal", function() {
@@ -309,7 +309,9 @@ function UpdateProjectTests(testsuitename) {
     for(var i=0; i < projects.length; i++) {
         if ($("#" + projects[i].id).hasClass("projectdata")) {
             // TODO: Check if checkbox is enabled, else continue
-            testsFromProjects += Number($("#badge" + projects[i].id).html());
+            if ($('#include' + projects[i].id).prop("checked")) {
+                testsFromProjects += Number($("#badge" + projects[i].id).html());
+            }
         }
     }
     $('#badge' + testsuitename).html(testsFromProjects);
