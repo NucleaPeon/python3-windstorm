@@ -321,5 +321,6 @@ function UpdateProjectTests(testsuitename) {
     $('#ProjectSelect').modal("hide");
     if ($("#tests" + testsuitename).children().length < 1) {
         $("#tests" + testsuitename).append($("<span>").html(testsFromProjects));
+        $('#collapseOne').collapse('show');
     }
 }
