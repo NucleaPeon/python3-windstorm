@@ -100,7 +100,7 @@
                 <span class="input-group-addon" id="project_title">Test Uploader</span>
                 <input id="testdnd" type="text" class="form-control" placeholder="Drop Tests Here" aria-describedby="upload_tests"
                        ondrop="droptest(event);" ondragover="allowDrop(event);">
-                <span class="input-group-addon btn btn-default" id="project_title" onclick="UploaderSettings();">
+                <span class="input-group-addon btn btn-default" id="plugin_settings_btn">
                     <span class="glyphicon glyphicon-cog" id="testuploadsettings"></span>
                 </span>
             </div>
@@ -112,6 +112,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+        <button type="button" class="btn btn-default" id="accept_ts_btn"><span class="glyphicon glyphicon-save"></span> Accept</button>
       </div>
     </div>
 

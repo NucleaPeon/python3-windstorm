@@ -16,6 +16,7 @@ $(document).on("ready", function() {
     });
     $("#ProjectSelect").on("hidden.bs.modal", function() {
         $('.progressbar').empty()
+        delete $('#accept_ts_btn').click();
     });
     
     $("#AddTestSuite").on("hidden.bs.modal", function() {
@@ -125,7 +126,7 @@ function GetProjects() {
                    var name = data.results[i];
                    if ($('#' + data.results[i]).length == 0) {
                         $("#projectlisting")
-                            .append($("<div>").attr("id", name)
+                            .append($("<div>").attr("id", name).addClass("projectdata")
                                 .append($("<div>").addClass("input-group")
                                     .append($("<span>").addClass("input-group-addon")
                                         .append($("<input>").addClass("checkbox").attr({
@@ -163,7 +164,6 @@ function GetProjects() {
                                                     data: {name: name},
                                                     success: function(projpaths) {
                                                         var paths = projpaths.results;
-                                                        console.log(paths);
                                                         $.ajax({
                                                             type: "POST",
                                                             url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
@@ -172,23 +172,20 @@ function GetProjects() {
                                                                 path: projpaths.results 
                                                             },
                                                             success: function(data) {
-                                                                console.log(data.results);
+                                                                $('#badge' + name).html(data.results.length);
                                                             },
                                                             dataType: "json"
                                                         }).done(function(data) {
-                                                            console.log(data);
                                                             $(refid).empty();
                                                         });
                                                     },
                                                     dataType: "json"
                                                 });
                                             }
-                                            console.log("Display Tests Button Clicked");
-                                            
                                         })
                                     )
                                     .append($("<span>").addClass("input-group-addon")
-                                        .append($("<span>").addClass("badge").html(0))
+                                        .append($("<span>").addClass("badge").attr("id", "badge" + name).html(0))
                                     )
                                 )
                             )
@@ -242,7 +239,7 @@ function AppendTestSuite(testsuitename) {
                 .append($("<div>").addClass("panel-body")
                     .append($("<ul>").addClass("list-group")
                         .append($("<li>").addClass("list-group-item")
-                            .append($("<span>").addClass("badge").html(0))
+                            .append($("<span>").addClass("badge").attr("id", "badge" + testsuitename).html(0))
                             .append($("<span>").addClass("glyphicon glyphicon-tasks").html("&nbsp;"))
                             .append($("<a>").addClass("accordion-toggle").attr({
                                 "data-parent": "#accordion2",
@@ -265,6 +262,11 @@ function AppendTestSuite(testsuitename) {
                                         .append("<span>").addClass("btn btn-default").html("Add Tests From...")
                                         .on("click", function() {
                                             $('#ProjectSelect').modal("show");
+                                            $('#accept_ts_btn').on("click", function() {
+                                                UpdateProjectTests(testsuitename);
+                                                console.log("Accept Test Suite Changes to " + testsuitename);
+                                                return false;
+                                            })
                                         })
                                     )
                                 )
@@ -299,6 +301,20 @@ function GetListOfPlugins() {
         },
         dataType: "json"
     });
+}
+
+function UpdateProjectTests(testsuitename) {
+    var projects = $('#projectlisting').children();
+    var testsFromProjects = 0;
+    for(var i=0; i < projects.length; i++) {
+        if ($("#" + projects[i].id).hasClass("projectdata")) {
+            // TODO: Check if checkbox is enabled, else continue
+            testsFromProjects += Number($("#badge" + projects[i].id).html());
+        }
+    }
+    $('#badge' + testsuitename).html(testsFromProjects);
+    $('#ProjectSelect').modal("hide");
+    
 }
 
 function LoadTestsByPlugin() {
