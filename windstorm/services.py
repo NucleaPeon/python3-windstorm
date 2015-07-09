@@ -60,8 +60,7 @@ class Services(daemon.Daemon):
                     'services': [],
                     'files': [],
                     'windstorminstances': []
-                },
-                'testsuitegroup': "TestTestGroup"
+                }
             }
         }
         self.testsuites = {
@@ -103,7 +102,7 @@ class Services(daemon.Daemon):
         return []
     
     def GetTestSuites(self, **kwargs):
-        return self.testgroups
+        return self.testsuites
     
     def DeleteTestSuites(self, suites=None, **kwargs):
         deltests = []

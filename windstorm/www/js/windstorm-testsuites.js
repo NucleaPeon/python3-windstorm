@@ -209,13 +209,11 @@ function CountTestsForProject(name, callback) {
 
 function AppendTestSuite(testsuitename) {
     if ($('#' + testsuitename).length == 0) {
-        console.log(testsuitename);
         CountTestsForProject(testsuitename, function(testlength, tests) {
             var testtables = [];
             for (var i=0; i < tests.length; i++) {
                 testtables.push($("<div>").attr("id", "header" + tests[i]).html(tests[i]));
             }
-            console.log(testtables);
             $('#TestSuiteListing')
                 .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
                     .append($("<div>").addClass("panel-heading")
@@ -299,12 +297,10 @@ function UpdateProjectTests(testsuitename) {
     for(var i=0; i < projects.length; i++) {
         projid =  projects[i].id;
         if ($("#" + projid).hasClass("projectdata")) {
-            console.log(projid);
             if ($('#include' + projid).prop("checked")) {
                 CountTestsForProject(projid, function(testCount, tests) {
                     testsFromProjects += Number(testCount)
                     $("#badge" + projid).html(testCount);
-                    console.log(testsFromProjects);
                     $('#badge' + testsuitename).html(testsFromProjects);
                     $('#ProjectSelect').modal("hide");
                     if ($("#tests" + testsuitename).children().length < 1) {
