@@ -114,7 +114,12 @@ function FileBrowseNotify(testsuitename, filefoldername) {
 
 function GenerateTestTable(testsuitename) {
     return [$("<br>"),
-            $("<div>").attr("id", "tests" + testsuitename)];
+            $("<div>").attr("id", 'tt' + testsuitename)
+                .append($("<div>").addClass("panel panel-default").attr("id", "header" + testsuitename)
+                    .append($("<span>").html("This is a test name "))
+                    .append($("<span>").addClass("glyphicon glyphicon-triangle-left").attr("id", "expand" + testsuitename))
+                )
+    ];
 }
 
 function GetProjects() {
@@ -213,25 +218,6 @@ function CountTestsForProject(name, callback) {
 }
 
 function AppendTestSuite(testsuitename) {
-    /**
-        * 
-        <!-- Contents here -->
-        <center>
-            <span class="glyphicon glyphicon-plus"></span> Add &nbsp; <span class="glyphicon glyphicon-remove"></span> Delete
-        </center>
-        
-        <table class="table">
-            <tr>
-                <td><input type="checkbox" aria-label="..."></td>
-                <td><code>Title</code></td>
-                <td>
-                </td>
-            </tr>
-            <tr>
-            </tr>
-        </table>
-        <!-- end -->
-    **/
     if ($('#' + testsuitename).length == 0) {
         $('#TestSuiteListing')
             .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
@@ -258,9 +244,9 @@ function AppendTestSuite(testsuitename) {
                             .append($("<span>").addClass("badge").attr("id", "badge" + testsuitename).html(0))
                             .append($("<span>").addClass("glyphicon glyphicon-tasks").html("&nbsp;"))
                             .append($("<a>").addClass("accordion-toggle").attr({
-                                "data-parent": "#accordion2",
+                                "data-parent": "#accordion"  + testsuitename,
                                 "data-toggle": "collapse",
-                                "href": "#collapseOne"
+                                "href": "#collapse" + testsuitename
                             }).html('Test Listings ')).append("&nbsp; &nbsp;").append($("<div>").addClass("btn-group").attr("role", "group")
                                 .append($("<div>").addClass("input-group")
                                     .append($("<span>").addClass("input-group-addon")
@@ -287,9 +273,9 @@ function AppendTestSuite(testsuitename) {
                                     )
                                 )
                             )
-                            .append($("<div>").addClass("accordion").attr("id", "accordion2")
+                            .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
                                 .append($("<div>").addClass("accordion-group")
-                                    .append($("<div>").addClass("accordion-body collapse").attr("id", "collapseOne")
+                                    .append($("<div>").addClass("accordion-body collapse").attr("id", "collapse" + testsuitename)
                                         .append($("<div>").addClass("accordion-inner")
                                             .append(GenerateTestTable(testsuitename))
                                         )
@@ -328,7 +314,7 @@ function UpdateProjectTests(testsuitename) {
                     else {
                         console.log("Update current test table values");
                     }
-                    $('#collapseOne').collapse('show');
+                    $('#collapse' + testsuitename).collapse('show');
                 });
             }
         }
