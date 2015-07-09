@@ -310,17 +310,28 @@ function UploaderSettings() {
 function UpdateProjectTests(testsuitename) {
     var projects = $('#projectlisting').children();
     var testsFromProjects = 0;
+    var projid = null;
     for(var i=0; i < projects.length; i++) {
-        if ($("#" + projects[i].id).hasClass("projectdata")) {
-            if ($('#include' + projects[i].id).prop("checked")) {
-                testsFromProjects += Number($("#badge" + projects[i].id).html());
+        projid =  projects[i].id;
+        if ($("#" + projid).hasClass("projectdata")) {
+            console.log(projid);
+            if ($('#include' + projid).prop("checked")) {
+                CountTestsForProject(projid, function(testCount, tests) {
+                    testsFromProjects += Number(testCount)
+                    $("#badge" + projid).html(testCount);
+                    console.log(testsFromProjects);
+                    $('#badge' + testsuitename).html(testsFromProjects);
+                    $('#ProjectSelect').modal("hide");
+                    if ($("#tests" + testsuitename).children().length < 1) {
+                        $("#tests" + testsuitename).append($("<span>").html(testsFromProjects));
+                    }
+                    else {
+                        console.log("Update current test table values");
+                    }
+                    $('#collapseOne').collapse('show');
+                });
             }
         }
     }
-    $('#badge' + testsuitename).html(testsFromProjects);
-    $('#ProjectSelect').modal("hide");
-    if ($("#tests" + testsuitename).children().length < 1) {
-        $("#tests" + testsuitename).append($("<span>").html(testsFromProjects));
-        $('#collapseOne').collapse('show');
-    }
+    
 }
