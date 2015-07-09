@@ -113,7 +113,8 @@ function FileBrowseNotify(testsuitename, filefoldername) {
 }
 
 function GenerateTestTable(testsuitename) {
-    return "<br>";
+    return [$("<br>"),
+            $("<div>").attr("id", "tests" + testsuitename)];
 }
 
 function GetProjects() {
@@ -157,30 +158,10 @@ function GetProjects() {
                                                         )
                                                     );
                                                 var refid = '#' + $(this).attr("refid");
-                                                var plugin = "TestsByFilename";
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: 'http://localhost:9090/Services/GetProjectPathsByName/',
-                                                    data: {name: name},
-                                                    success: function(projpaths) {
-                                                        var paths = projpaths.results;
-                                                        $.ajax({
-                                                            type: "POST",
-                                                            url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
-                                                            data: {
-                                                                plugin: plugin,
-                                                                path: projpaths.results 
-                                                            },
-                                                            success: function(data) {
-                                                                $('#badge' + name).html(data.results.length);
-                                                            },
-                                                            dataType: "json"
-                                                        }).done(function(data) {
-                                                            $(refid).empty();
-                                                        });
-                                                    },
-                                                    dataType: "json"
+                                                CountTestsForProject(name, function() {
+                                                    $(refid).empty();
                                                 });
+                                                
                                             }
                                         })
                                     )
@@ -194,6 +175,41 @@ function GetProjects() {
                 }
             }
     );
+}
+
+function CountTestsForProject(name, callback) {
+    /**
+     * Function that updates modal window test counts for a project
+     * based on name.
+     * 
+     * Callback argument is optional; if supplied, it will call
+     * the method with the number of tests it found as the first parameter
+     * and list of test names as second.
+     */
+    var plugin = "TestsByFilename";
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/GetProjectsByName/',
+        data: {name: name},
+        success: function(project) {
+            $.ajax({
+                type: "POST",
+                url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
+                data: {
+                    plugin: project.results.plugin,
+                    path: project.results.paths
+                },
+                success: function(data) {
+                    $('#badge' + name).html(data.results.length);
+                    if (callback !== undefined) {
+                        callback(data.results.length, data.results);
+                    }
+                },
+                dataType: "json"
+            });
+        },
+        dataType: "json"
+    });
 }
 
 function AppendTestSuite(testsuitename) {
@@ -262,9 +278,9 @@ function AppendTestSuite(testsuitename) {
                                         .append("<span>").addClass("btn btn-default").html("Add Tests From...")
                                         .on("click", function() {
                                             $('#ProjectSelect').modal("show");
+                                            // Add accept button event to update test values
                                             $('#accept_ts_btn').on("click", function() {
                                                 UpdateProjectTests(testsuitename);
-                                                console.log("Accept Test Suite Changes to " + testsuitename);
                                                 return false;
                                             })
                                         })
@@ -291,24 +307,11 @@ function UploaderSettings() {
     console.log("TODO");
 }
 
-function GetListOfPlugins() {
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:9090/Services/GetListOfPlugins/',
-        data: {},
-        success: function(data) {
-            console.log(data.results);
-        },
-        dataType: "json"
-    });
-}
-
 function UpdateProjectTests(testsuitename) {
     var projects = $('#projectlisting').children();
     var testsFromProjects = 0;
     for(var i=0; i < projects.length; i++) {
         if ($("#" + projects[i].id).hasClass("projectdata")) {
-            // TODO: Check if checkbox is enabled, else continue
             if ($('#include' + projects[i].id).prop("checked")) {
                 testsFromProjects += Number($("#badge" + projects[i].id).html());
             }
@@ -316,41 +319,7 @@ function UpdateProjectTests(testsuitename) {
     }
     $('#badge' + testsuitename).html(testsFromProjects);
     $('#ProjectSelect').modal("hide");
-    
-}
-
-function LoadTestsByPlugin() {
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
-        data: {},
-        success: function(data) {
-            console.log(data.results);
-        },
-        dataType: "json"
-    });
-    
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
-        data: {plugin: "TestsByFilename"},
-        success: function(data) {
-            console.log(data.results);
-        },
-        dataType: "json"
-    });
-}
-
-function GetProjectPathsByName(name) {
-    console.log(name);
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:9090/Services/GetProjectPathsByName/',
-        data: {name: name},
-        success: function(projpaths) {
-            console.log(projpaths.results);
-        },
-        dataType: "json"
-    }).done(function(data) {
-    });
+    if ($("#tests" + testsuitename).children().length < 1) {
+        $("#tests" + testsuitename).append($("<span>").html(testsFromProjects));
+    }
 }

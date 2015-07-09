@@ -55,6 +55,7 @@ class Services(daemon.Daemon):
             'TestProject' : {
                 'title': "TestProject",
                 'paths': ['/tmp/'],
+                'plugin': "TestsByFilename",
                 'depends': {
                     'services': [],
                     'files': [],
@@ -83,6 +84,14 @@ class Services(daemon.Daemon):
             name = name[0].decode('utf-8')
             if not self.projects.get(name) is None:
                 return self.projects[name]["paths"]
+            
+        return []
+    
+    def GetProjectsByName(self, name=None, *kwargs):
+        if not name is None:
+            name = name[0].decode('utf-8')
+            if not self.projects.get(name) is None:
+                return self.projects[name]
             
         return []
     
