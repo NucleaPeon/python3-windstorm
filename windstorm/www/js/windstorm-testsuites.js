@@ -332,8 +332,28 @@ function RefreshTestViewInSuite(testsuitename) {
         },
         success: function(data) {
             console.log(data.results);
-            $("#tstests" + testsuitename).empty();
-            $("#tstests" + testsuitename).append($("<span>").html("This is a span that should eventually be a test listing"));
+            $("#tstests" + testsuitename).empty().append($("<br>"));
+            for (var i=0; i<data.results.projects.length; i++) {
+                $('#tstests' + testsuitename)
+                    .append($("<div>").addClass("panel panel-default")
+                        .append($("<div>").addClass("panel-heading")
+                            .append($("<h3>").addClass("panel-title").html(data.results.projects[i]))
+                            .on("click", function() {
+                                $('#inner' + testsuitename + data.results.projects[i]).collapse('toggle');
+                            })
+                        )
+                        .append($("<div>").addClass("accordion panel-body").attr("id", testsuitename + data.results.projects[i])
+                                .append($("<div>").addClass("accordion-group")
+                                    .append($("<div>").addClass("accordion-body collapse in").attr("id", "inner" + testsuitename + data.results.projects[i])
+                                        .append($("<div>").addClass("accordion-inner").attr("id", "tstests" + testsuitename).html("Content"))
+                                    )
+                                )
+                            )
+                    );
+            }
+            for (var i=0; i<data.results.additional.length; i++) {
+                console.log(data.results.additional[i]);
+            }
             $('#collapse' + testsuitename).collapse('show');
         },
         dataType: "json"
