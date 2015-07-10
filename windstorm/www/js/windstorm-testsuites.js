@@ -209,80 +209,73 @@ function CountTestsForProject(name, callback) {
 
 function AppendTestSuite(testsuitename) {
     if ($('#' + testsuitename).length == 0) {
-        CountTestsForProject(testsuitename, function(testlength, tests) {
-            var testtables = [];
-            for (var i=0; i < tests.length; i++) {
-                testtables.push($("<div>").attr("id", "header" + tests[i]).html(tests[i]));
-            }
-            $('#TestSuiteListing')
-                .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
-                    .append($("<div>").addClass("panel-heading")
-                        .append($("<div>").addClass("input-group")
-                            .append($("<span>").addClass("input-group-addon")
-                                .append($("<input>").addClass("checkbox").attr({
-                                    "type": "checkbox",
-                                    "aria-label": "..."
-                                })
-                                .on("click", function() { SelectTest(testsuitename); } ))
-                            )
-                            .append($("<input>").attr({
-                                "id": testsuitename + "Lbl",
-                                "type": "text",
-                                "placeholder": "Test Suite Name",
-                                "disabled": "disabled"
-                            }).val(testsuitename).addClass("text form-control"))
+    
+        $('#TestSuiteListing')
+            .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
+                .append($("<div>").addClass("panel-heading")
+                    .append($("<div>").addClass("input-group")
+                        .append($("<span>").addClass("input-group-addon")
+                            .append($("<input>").addClass("checkbox").attr({
+                                "type": "checkbox",
+                                "aria-label": "..."
+                            })
+                            .on("click", function() { SelectTest(testsuitename); } ))
                         )
+                        .append($("<input>").attr({
+                            "id": testsuitename + "Lbl",
+                            "type": "text",
+                            "placeholder": "Test Suite Name",
+                            "disabled": "disabled"
+                        }).val(testsuitename).addClass("text form-control"))
                     )
-                    .append($("<div>").addClass("panel-body")
-                        .append($("<ul>").addClass("list-group")
-                            .append($("<li>").addClass("list-group-item")
-                                .append($("<span>").addClass("badge").attr("id", "badge" + testsuitename).html(0))
-                                .append($("<span>").addClass("glyphicon glyphicon-tasks").html("&nbsp;"))
-                                .append($("<a>").addClass("accordion-toggle").attr({
-                                    "data-parent": "#accordion"  + testsuitename,
-                                    "data-toggle": "collapse",
-                                    "href": "#collapse" + testsuitename
-                                }).html('Test Listings ')).append("&nbsp; &nbsp;").append($("<div>").addClass("btn-group").attr("role", "group")
-                                    .append($("<div>").addClass("input-group")
-                                        .append($("<span>").addClass("input-group-addon")
-                                            .append($("<input>").addClass("checkbox").attr({
-                                                    "type": "checkbox",
-                                                    "aria-label": "...",
-                                                    "id": "update" + testsuitename
-                                                })
-                                            )
-                                        )
-                                        .append($("<span>").addClass("input-group-addon")
-                                            .append($("<span>").html("Update Tests on Run"))
-                                        )
-                                        .append($("<span>").addClass("input-group-addon")
-                                            .append("<span>").addClass("btn btn-default").html("Add Tests From...")
-                                            .on("click", function() {
-                                                $('#ProjectSelect').modal("show");
-                                                // Add accept button event to update test values
-                                                $('#accept_ts_btn').on("click", function() {
-                                                    UpdateProjectTests(testsuitename);
-                                                    return false;
-                                                })
+                )
+                .append($("<div>").addClass("panel-body")
+                    .append($("<ul>").addClass("list-group")
+                        .append($("<li>").addClass("list-group-item")
+                            .append($("<span>").addClass("badge").attr("id", "badge" + testsuitename).html(0))
+                            .append($("<span>").addClass("glyphicon glyphicon-tasks").html("&nbsp;"))
+                            .append($("<a>").addClass("accordion-toggle").attr({
+                                "data-parent": "#accordion"  + testsuitename,
+                                "data-toggle": "collapse",
+                                "href": "#collapse" + testsuitename
+                            }).html('Test Listings ')).append("&nbsp; &nbsp;").append($("<div>").addClass("btn-group").attr("role", "group")
+                                .append($("<div>").addClass("input-group")
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<input>").addClass("checkbox").attr({
+                                                "type": "checkbox",
+                                                "aria-label": "...",
+                                                "id": "update" + testsuitename
                                             })
                                         )
                                     )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append($("<span>").html("Update Tests on Run"))
+                                    )
+                                    .append($("<span>").addClass("input-group-addon")
+                                        .append("<span>").addClass("btn btn-default").html("Add Tests From...")
+                                        .on("click", function() {
+                                            $('#ProjectSelect').modal("show");
+                                            // Add accept button event to update test values
+                                            $('#accept_ts_btn').on("click", function() {
+                                                UpdateProjectTests(testsuitename);
+                                                return false;
+                                            })
+                                        })
+                                    )
                                 )
-                                .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
-                                    .append($("<div>").addClass("accordion-group")
-                                        .append($("<div>").addClass("accordion-body collapse").attr("id", "collapse" + testsuitename)
-                                            .append($("<div>").addClass("accordion-inner")
-                                                .append(testtables)
-                                            )
+                            )
+                            .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
+                                .append($("<div>").addClass("accordion-group")
+                                    .append($("<div>").addClass("accordion-body collapse").attr("id", "collapse" + testsuitename)
+                                        .append($("<div>").addClass("accordion-inner").attr("id", "tstests" + testsuitename)
                                         )
                                     )
                                 )
                             )
                         )
                     )
-            );
-        });
-        
+                )
+        );
     }
 }
 
@@ -291,6 +284,21 @@ function UploaderSettings() {
 }
 
 function UpdateProjectTests(testsuitename) {
+    /**
+     * Invoked when the user clicks "accept" button in modal window
+     * for adding in project and additional tests into the suite.
+     * 
+     * Updates project information from the modal window, specifically
+     * the checked projects and any additional tests dragged into the
+     * drop element.
+     * 
+     * If a project is selected for inclusion of its tests into the 
+     * suite, it will count the tests for the project and add them
+     * into badges (refreshes all tests) and hides modal window.
+     * 
+     * Requests a refreshed test view on the main testsuite web page
+     * in the suite's accordion elements.
+     */
     var projects = $('#projectlisting').children();
     var testsFromProjects = 0;
     var projid = null;
@@ -303,18 +311,33 @@ function UpdateProjectTests(testsuitename) {
                     $("#badge" + projid).html(testCount);
                     $('#badge' + testsuitename).html(testsFromProjects);
                     $('#ProjectSelect').modal("hide");
-                    if ($("#tests" + testsuitename).children().length < 1) {
-                        $("#tests" + testsuitename).append($("<span>").html(testsFromProjects));
-                    }
-                    else {
-                        console.log("Update current test table values");
-                    }
-                    $('#collapse' + testsuitename).collapse('show');
+                    $('#tests' + testsuitename).append("Test");
                 });
             }
+            else {
+                $('#ProjectSelect').modal("hide");
+            }
+            RefreshTestViewInSuite(testsuitename);
         }
     }
     
+}
+
+function RefreshTestViewInSuite(testsuitename) {
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:9090/Services/GetTestsBySuiteName/',
+        data: {
+            suite: testsuitename
+        },
+        success: function(data) {
+            console.log(data.results);
+            $("#tstests" + testsuitename).empty();
+            $("#tstests" + testsuitename).append($("<span>").html("This is a span that should eventually be a test listing"));
+            $('#collapse' + testsuitename).collapse('show');
+        },
+        dataType: "json"
+    });
 }
 
 function TestGetGroups() {
