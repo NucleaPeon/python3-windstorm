@@ -419,22 +419,29 @@ function StartRunTests() {
         $.post("http://localhost:9090/Services/GetTestsBySuiteName/",
             {suite: testsuitename},
             function(data) {
-                
+                $.post("http://localhost:9090/Services/GetGroupTestFilenames/",
+                    {group: "TestTestGroup"}, /** FIXME: Hardcode for now **/
+                    function(testdata) {
+                        // Calculate total tests
+                        var total = 0;
+                        for(var group in testdata.results) {
+                            for(var suite in testdata.results[group]) {
+                                for(var project in testdata.results[group][suite]) {
+                                    total += testdata.results[group][suite][project].length;
+                                }
+                            }
+                        }
+                        console.log(total);
+                    },
+                    "json"
+                );
             },
             "json"
         ).done(function(data) {
-            
             $("#run").removeAttr("disabled");
         });
     }
 }
 
 function TestGroupTestsByFilename() {
-    $.post("http://localhost:9090/Services/GetGroupTestFilenames/",
-        {group: "TestTestGroup"},
-        function(data) {
-            console.log(data)
-        },
-        "json"
-    );
 }
