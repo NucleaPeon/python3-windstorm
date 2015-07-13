@@ -21,3 +21,7 @@
     cursor: inherit;
     display: block;
 }
+
+.input-group input[type=text] {
+    background-color:white !important;
+}

@@ -26,6 +26,15 @@ try:
     
 except ImportError as iE:
     import daemon as daemon
+    
+RESULT_STATUS = {
+    "complete": 0,
+    "running": 1,
+    "updating": 2, # updating tests when box is checked
+    "failure": 3,
+    "success": 4,
+    "error": 255
+}
 
 class Services(daemon.Daemon):
     
@@ -71,6 +80,21 @@ class Services(daemon.Daemon):
         }
         self.testgroups = {
             'TestTestGroup': ['TestTestSuite']
+        }
+        
+        self.testresults = {
+            'TestGroupX' : {
+                "status": RESULT_STATUS['complete'],
+                "tests": {
+                    "TestOne": {
+                        "TestSomethingInTestOne": {
+                            "result": RESULT_STATUS["success"],
+                            "trace": "",
+                            "output": ""
+                        }
+                    }
+                }
+            }
         }
         
         self.application = tornado.web.Application([

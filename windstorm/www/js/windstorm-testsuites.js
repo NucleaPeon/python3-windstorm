@@ -23,6 +23,17 @@ $(document).on("ready", function() {
         delete $(document).keypress();
         $("#tsname").val("");
     });
+    
+    $("#RunTestModal").on("shown.bs.modal", function() {
+        $('#run').on("click", function() {
+            alert("Clicked");
+        });
+    });
+    
+    $("#RunTestModal").on("hidden.bs.modal", function() {
+        $('#run').off("click");
+    });
+    
 });
 
 function GetTestSuites(callback) {
@@ -263,7 +274,11 @@ function AppendTestSuite(testsuitename) {
                                         })
                                     )
                                     .append($('<span disabled="disabled">').addClass("input-group-addon btn btn-success").html("Run Tests").css("color", "white")
-                                    .attr("id", "runtests" + testsuitename))
+                                    .attr({"id": "runtests" + testsuitename, "proj": testsuitename})
+                                    .on("click", function() {
+                                        $('#runtesttitle').html($(this).attr("proj"));
+                                        $('#RunTestModal').modal("show");
+                                    }))
                                 )
                             )
                             .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
@@ -339,12 +354,10 @@ function RefreshTestViewInSuite(testsuitename) {
             for (var i=0; i<data.results.projects.length; i++) {
                 CountTestsForProject(data.results.projects[i], function(numtests, tests) {
                     testcount += Number(numtests);
-                    console.log(numtests);
                     testlist = [];
                     for (var j=0; j < tests.length; j++) {
                         testlist.push($("<li>").addClass("list-group-item").html(tests[j]))
                     }
-                    console.log(tests);
                     $('#tstests' + testsuitename)
                         .append($("<div>").addClass("panel panel-default")
                             .append($("<div>").addClass("panel-heading")
@@ -363,7 +376,6 @@ function RefreshTestViewInSuite(testsuitename) {
                                 )
                         );
                     $('#badge' + testsuitename).html(testcount);
-                    console.log(testcount);
                     if (testcount > 0) {
                         $('#runtests' + testsuitename).removeAttr('disabled');
                     }
