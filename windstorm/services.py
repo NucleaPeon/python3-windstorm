@@ -214,6 +214,51 @@ class Services(daemon.Daemon):
             
         return tests
     
+    def GetGroupTestFilenames(self, group=None, **kwargs):
+        """
+        :Description:
+            This method is similar to GetTestsByGroupName, but instead of returning a
+            list of project tests per suite per group with a dict structure, this 
+            returns an implied structure with filenames; it calls plugins to produce
+            lists so RunTests() can be called directly with knowledge of the maximum
+            number of tests it has to run.
+        """
+        if group is None:
+            return None
+        
+        tests = {}
+        tmptests = []
+        group = group[0].decode('utf-8')
+        suite = None
+        projects = None
+        if group in self.testgroups:
+            suite = self.testgroups.get(group)
+            if suite is None:
+                logging.error("Group has no associated suite")
+                return suite
+            
+            for s in suite:
+                projects = self.testsuites[s]["projects"]
+                if projects:
+                    # Run through plugins to get filenames
+                    for p in projects:
+                        for pth in self.projects[p]['paths']:
+                            tmptests.extend(self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
+                                                                path=[bytes(pth, "utf-8")]))
+                            
+                        if tmptests:
+                            tests[group] = {s: {p: tmptests}}
+                                            
+        
+        return tests
+    
+    def RunTests(self, tests=[], **kwargs):
+        results = []
+        for t in tests:
+            results.append(t)
+            
+        return results
+    
 def start(pidfile, in_dir="/"):
     try:    
         pid = os.fork()

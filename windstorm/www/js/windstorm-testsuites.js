@@ -26,7 +26,7 @@ $(document).on("ready", function() {
     
     $("#RunTestModal").on("shown.bs.modal", function() {
         $('#run').on("click", function() {
-            alert("Clicked");
+            StartRunTests();
         });
     });
     
@@ -390,17 +390,51 @@ function RefreshTestViewInSuite(testsuitename) {
     });
 }
 
-function TestGetGroups() {
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:9090/Services/GetTestsByGroupName/',
-        data: {
-            group: "TestTestGroup"
+function StartRunTests() {
+    $('#testprogress').empty();
+    var updatepb = function (name, percent, msg) {
+        // msg is optional, if undefined it is the value of percent + "%"
+        
+    };
+    $('#run').attr({"disabled": "disabled"});
+    var testsuitename = $('#runtesttitle').html();
+    if ((testsuitename !== undefined) && (testsuitename != "")) {
+        $('#testprogress')
+            .append($("<hr>"))
+            .append($("<br>"))
+            .append($("<div>").addClass("progress")
+                .append($("<div>").addClass("progress-bar").attr({
+                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0",
+                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
+                }).html("60%"))
+             )
+            .append($("<div>").addClass("progress")
+                .append($("<div>").addClass("progress-bar").attr({
+                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0",
+                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_single"
+                }).html("60%"))
+             );
+            
+        // Start running tests
+        $.post("http://localhost:9090/Services/GetTestsBySuiteName/",
+            {suite: testsuitename},
+            function(data) {
+                
+            },
+            "json"
+        ).done(function(data) {
+            
+            $("#run").removeAttr("disabled");
+        });
+    }
+}
+
+function TestGroupTestsByFilename() {
+    $.post("http://localhost:9090/Services/GetGroupTestFilenames/",
+        {group: "TestTestGroup"},
+        function(data) {
+            console.log(data)
         },
-        success: function(data) {
-            console.log(data.results);
-        },
-        dataType: "json"
-    });
-    
+        "json"
+    );
 }
