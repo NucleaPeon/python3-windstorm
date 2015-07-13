@@ -262,6 +262,8 @@ function AppendTestSuite(testsuitename) {
                                             })
                                         })
                                     )
+                                    .append($('<span disabled="disabled">').addClass("input-group-addon btn btn-success").html("Run Tests").css("color", "white")
+                                    .attr("id", "runtests" + testsuitename))
                                 )
                             )
                             .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
@@ -331,25 +333,41 @@ function RefreshTestViewInSuite(testsuitename) {
             suite: testsuitename
         },
         success: function(data) {
-            console.log(data.results);
             $("#tstests" + testsuitename).empty().append($("<br>"));
+            var testcount = 0;
+            var testlist = null;
             for (var i=0; i<data.results.projects.length; i++) {
-                $('#tstests' + testsuitename)
-                    .append($("<div>").addClass("panel panel-default")
-                        .append($("<div>").addClass("panel-heading")
-                            .append($("<h3>").addClass("panel-title").html(data.results.projects[i]))
-                            .on("click", function() {
-                                $('#inner' + testsuitename + data.results.projects[i]).collapse('toggle');
-                            })
-                        )
-                        .append($("<div>").addClass("accordion panel-body").attr("id", testsuitename + data.results.projects[i])
-                                .append($("<div>").addClass("accordion-group")
-                                    .append($("<div>").addClass("accordion-body collapse in").attr("id", "inner" + testsuitename + data.results.projects[i])
-                                        .append($("<div>").addClass("accordion-inner").attr("id", "tstests" + testsuitename).html("Content"))
+                CountTestsForProject(data.results.projects[i], function(numtests, tests) {
+                    testcount += Number(numtests);
+                    console.log(numtests);
+                    testlist = [];
+                    for (var j=0; j < tests.length; j++) {
+                        testlist.push($("<li>").addClass("list-group-item").html(tests[j]))
+                    }
+                    console.log(tests);
+                    $('#tstests' + testsuitename)
+                        .append($("<div>").addClass("panel panel-default")
+                            .append($("<div>").addClass("panel-heading")
+                                .append($("<h3>").addClass("panel-title").html(data.results.projects[i]))
+                                .on("click", function() {
+                                    $('#collapse' + testsuitename + data.results.projects[i]).collapse('toggle');
+                                })
+                            )
+                            .append($("<div>").addClass("accordion panel-body").attr("id", testsuitename + data.results.projects[i])
+                                    .append($("<div>").addClass("in collapse accordion-group accordion-body")
+                                    .attr("id", "collapse" + testsuitename + data.results.projects[i])
+                                            .append($("<ul>").addClass("list-group")
+                                                    .append(testlist)
+                                            )
                                     )
                                 )
-                            )
-                    );
+                        );
+                    $('#badge' + testsuitename).html(testcount);
+                    console.log(testcount);
+                    if (testcount > 0) {
+                        $('#runtests' + testsuitename).removeAttr('disabled');
+                    }
+                });
             }
             for (var i=0; i<data.results.additional.length; i++) {
                 console.log(data.results.additional[i]);
