@@ -283,6 +283,7 @@ function AppendTestSuite(testsuitename) {
                                         .attr({"id": "runtestsauto" + testsuitename, "proj": testsuitename})
                                         .on("click", function() {
                                             $('#runtesttitle').html($(this).attr("proj"));
+                                            $('#runtestsauto' + testsuitename).attr({"disabled": "disabled"})
                                             StartRunTests();
                                         })
                                     )
@@ -398,11 +399,10 @@ function RefreshTestViewInSuite(testsuitename) {
     });
 }
 
-function StartRunTests() {
+function StartRunTests(completecallback) {
     $('#testprogress').empty();
     $('#run').attr({"disabled": "disabled"});
     var testsuitename = $('#runtesttitle').html();
-    console.log(testsuitename);
     if ((testsuitename !== undefined) && (testsuitename != "")) {
         $('#testprogress')
             .append($("<hr>"))
@@ -410,22 +410,29 @@ function StartRunTests() {
             .append($("<div>").addClass("progress")
                 .append($("<div>").addClass("progress-bar").attr({
                     "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
-                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
+                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_single"
                 }).css("color", "black"))
              )
             .append($("<div>").addClass("progress")
                 .append($("<div>").addClass("progress-bar").attr({
                     "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
-                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_single"
+                    "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
                 }).css("color", "black"))
              );
             
         // Define async callback methods for "synchronous-like" functionality loops
         var runtest = function(tests, totaltests, callback) {
-            $('#run_overall').css("width",  (((totaltests-tests.length) / totaltests) * 100) + "%");
+            
             if (tests.length <= 0) {
+                $('#run_overall').css("width",  "100%");
+                $("#run").removeAttr("disabled");
+                $('#runtestsauto' + testsuitename).removeAttr("disabled")
+                if (completecallback !== undefined) {
+                    completecallback();
+                }
                 return;
             }
+            
             /**
              * tests: list of filename/paths to test modules
              * totaltests: length of every test module being run (does not change)
@@ -471,16 +478,12 @@ function StartRunTests() {
                                 }
                             }
                         }
-                        
-                        //$('#run_overall');
                     },
                     "json"
                 );
             },
             "json"
-        ).done(function(data) {
-            $("#run").removeAttr("disabled");
-        });
+        );
     }
 }
 
