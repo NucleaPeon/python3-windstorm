@@ -101,7 +101,8 @@ function DeleteTestSuites() {
     if (suitelbls.length > 0) {
         jQuery.ajaxSettings.traditional = true;
         $.post('http://localhost:9090/Services/DeleteTestSuites/',
-           {"suites": suitelbls},
+           {"suites": suitelbls,
+            "group": "TestTestGroup"},
            function(data) {
                console.log(data);
            });
@@ -112,7 +113,12 @@ function DeleteTestSuites() {
 }
 
 function SaveTestSuite(testsuitename) {
-    AppendTestSuite(testsuitename);
+    $.post('http://localhost:9090/Services/SaveTestSuite/',
+           {suite: testsuitename,
+            group: "TestTestGroup"},
+           function(data) {
+               GetTestSuites();
+           });
 }
 
 function Upload(testsuitename) {
@@ -327,10 +333,12 @@ function UpdateProjectTests(testsuitename) {
     var projects = $('#projectlisting').children();
     var testsFromProjects = 0;
     var projid = null;
+    var checked = [];
     for(var i=0; i < projects.length; i++) {
         projid =  projects[i].id;
         if ($("#" + projid).hasClass("projectdata")) {
             if ($('#include' + projid).prop("checked")) {
+                checked.push(projid);
                 CountTestsForProject(projid, function(testCount, tests) {
                     testsFromProjects += Number(testCount)
                     $("#badge" + projid).html(testCount);
@@ -342,9 +350,18 @@ function UpdateProjectTests(testsuitename) {
             else {
                 $('#ProjectSelect').modal("hide");
             }
-            RefreshTestViewInSuite(testsuitename);
         }
     }
+    $.post("http://localhost:9090/Services/UpdateTestSuite/",
+        {projects: checked,
+         suite: testsuitename},
+        function(data) {
+            console.log(data);
+        },
+        "json"
+    ).done(function(data) {
+        RefreshTestViewInSuite(testsuitename);
+    });
     
 }
 

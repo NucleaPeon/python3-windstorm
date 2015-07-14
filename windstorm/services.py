@@ -128,16 +128,40 @@ class Services(daemon.Daemon):
     def GetTestSuites(self, **kwargs):
         return self.testsuites
     
-    def DeleteTestSuites(self, suites=None, **kwargs):
+    def SaveTestSuite(self, suite=None, group=None, **kwargs):
+        if not suite is None:
+            suite = suite[0].decode("utf-8")
+            
+        if not group is None:
+            group = group[0].decode("utf-8")
+            
+        if not suite in self.testsuites:
+            self.testsuites[suite] = {"projects": [], "additional": {}}
+            
+        if self.testgroups.get(group) is None:
+            self.testgroups[group] = [suite]
+        
+        else:
+            self.testgroups[group].append(suite)
+    
+    def DeleteTestSuites(self, suites=None, group=None, **kwargs):
         deltests = []
+        if not group is None:
+            group = group[0].decode('utf-8')
+            
         for s in suites:
             s = s.decode('utf-8')
-            if not s in self.testgroups:
+            if not s in self.testgroups[group]:
+                logging.info("{} not in test groups".format(s))
                 continue
                 
             else:
-                del self.testgroups[s]
-                deltests.append(s)
+                if s in self.testgroups[group]:
+                    self.testgroups[group] = list(filter(lambda x: x != s, self.testgroups[group]))
+                    logging.info("{} found in groups and removed".format(s))
+                    if s in self.testsuites:
+                        del self.testsuites[s]
+                    deltests.append(s)
             
         return dict(deleted=deltests)
     
@@ -214,6 +238,16 @@ class Services(daemon.Daemon):
             
         return tests
     
+    def UpdateTestSuite(self, suite=None, projects=None, **kwargs):
+        if suite is None or projects is None:
+            return None
+        
+        suite = suite[0].decode("utf-8")
+        projects = list(map(lambda x: x.decode("utf-8"), projects))
+        logging.info(suite)
+        logging.info(projects)
+        self.testsuites[suite]["projects"] = projects
+    
     def GetGroupTestFilenames(self, group=None, **kwargs):
         """
         :Description:
@@ -254,6 +288,9 @@ class Services(daemon.Daemon):
     
     def RunTest(self, test=None, **kwargs):
         return None
+    
+    def CountTestModulesInFile(self, test=None, **kwargs):
+        return 1
     
 def start(pidfile, in_dir="/"):
     try:    
