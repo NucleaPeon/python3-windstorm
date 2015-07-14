@@ -193,6 +193,11 @@ class Services(daemon.Daemon):
             
         return dict(deleted=json.dumps(retval))
     
+    def UpdateProject(self, project=None, files=None, **kwargs):
+        logging.info(project)
+        logging.info(files)
+        return None
+    
     def LoadTestsByPlugin(self, plugin=None, path=None, **kwargs):    
         if not plugin is None:
             plugin = plugin[0].decode('utf-8')

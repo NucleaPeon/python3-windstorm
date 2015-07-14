@@ -36,7 +36,24 @@ function SaveProject() {
                $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.project.title));
            }
     );
-    
+}
+
+function UpdateProject() {
+    // projectfilepath
+    // TEMP:
+    var items = [];
+    var elements = $(".projectfilepath input");
+    for (var i=0; i < elements.length; i++) {
+        items.push(elements[i].value);
+    }
+    jQuery.ajaxSettings.traditional = true;
+    $.post('http://localhost:9090/Services/UpdateProject/',
+           {project: $('#modal-header-title').html(),
+            files: items},
+           function(data) {
+               $("#Messages").append($("<li>").addClass("list-group-item").html("Updated Project" + $('#modal-header-title').html()));
+           },
+           "json");
 }
 
 function GetProjects(callback) {
@@ -114,19 +131,17 @@ function ProjectUploadFolder(event) {
     data = data.split("\n");
     var filename = null;
     for (d in data) {
-        $('#list_projectfiles')
-            .append($("<div>").addClass("input-group projectfilepath").attr("id", "filename" + d)
-                .append($("<span>").addClass("input-group-addon glyphicon glyphicon-file"))
-                .append($("<input>").prop("type", "text").prop("disabled", true).addClass("form-control").val(data[d]))
-                .append($("<span>").addClass("input-group-addon btn btn-default glyphicon glyphicon-remove")
-                    .on("click", function() {
-                        console.log("Remove");
-                        $(this).parent().remove();
-                    })
-                ).css("padding-bottom", "1em"));
-            
-            
-            //.html(data[d]));
+        if ((data[d] != "") && (data[d] !== undefined)) {
+            $('#list_projectfiles')
+                .append($("<div>").addClass("input-group projectfilepath").attr("id", "filename" + d)
+                    .append($("<span>").addClass("input-group-addon glyphicon glyphicon-file"))
+                    .append($("<input>").prop("type", "text").prop("disabled", true).addClass("form-control").val(data[d]))
+                    .append($("<span>").addClass("input-group-addon btn btn-default glyphicon glyphicon-remove")
+                        .on("click", function() {
+                            $(this).parent().remove();
+                        })
+                    ).css("padding-bottom", "1em"));
+        }
     }
 }
 

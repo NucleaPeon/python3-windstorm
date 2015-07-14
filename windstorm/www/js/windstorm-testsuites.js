@@ -129,7 +129,6 @@ function FileBrowseNotify(testsuitename, filefoldername) {
     alert("Please drag and drop your file or folder into the text input");
 }
 
-
 function GetProjects() {
     // Return all projects, or display notification that no projects exist
     $.post('http://localhost:9090/Services/GetProjects/',
