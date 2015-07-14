@@ -23,7 +23,8 @@ function SaveProject() {
         // Highlight the field in red background by adding in required class
         return undefined
     }
-    var projname = $('#mpname').val();
+    // TODO: Validation of title
+    var projname = $('#mpname').val().replace(" ", "_");
     $.post('http://localhost:9090/Services/SaveProject/', 
            {'project': JSON.stringify({'title': projname})},
            function(data) {
