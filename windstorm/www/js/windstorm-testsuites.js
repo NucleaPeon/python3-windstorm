@@ -279,6 +279,13 @@ function AppendTestSuite(testsuitename) {
                                         $('#runtesttitle').html($(this).attr("proj"));
                                         $('#RunTestModal').modal("show");
                                     }))
+                                    .append($('<span disabled="disabled">').addClass("input-group-addon btn btn-success glyphicon glyphicon-play")
+                                        .attr({"id": "runtestsauto" + testsuitename, "proj": testsuitename})
+                                        .on("click", function() {
+                                            $('#runtesttitle').html($(this).attr("proj"));
+                                            StartRunTests();
+                                        })
+                                    )
                                 )
                             )
                             .append($("<div>").addClass("accordion").attr("id", "accordion" + testsuitename)
@@ -378,6 +385,7 @@ function RefreshTestViewInSuite(testsuitename) {
                     $('#badge' + testsuitename).html(testcount);
                     if (testcount > 0) {
                         $('#runtests' + testsuitename).removeAttr('disabled');
+                        $('#runtestsauto' + testsuitename).removeAttr('disabled');
                     }
                 });
             }
@@ -392,29 +400,42 @@ function RefreshTestViewInSuite(testsuitename) {
 
 function StartRunTests() {
     $('#testprogress').empty();
-    var updatepb = function (name, percent, msg) {
-        // msg is optional, if undefined it is the value of percent + "%"
-        
-    };
     $('#run').attr({"disabled": "disabled"});
     var testsuitename = $('#runtesttitle').html();
+    console.log(testsuitename);
     if ((testsuitename !== undefined) && (testsuitename != "")) {
         $('#testprogress')
             .append($("<hr>"))
             .append($("<br>"))
             .append($("<div>").addClass("progress")
                 .append($("<div>").addClass("progress-bar").attr({
-                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0",
+                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
-                }).html("60%"))
+                }).html("0%").css("color", "black"))
              )
             .append($("<div>").addClass("progress")
                 .append($("<div>").addClass("progress-bar").attr({
-                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "0",
+                    "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_single"
-                }).html("60%"))
+                }).html("0%").css("color", "black"))
              );
             
+        // Define async callback methods for "synchronous-like" functionality loops
+        var runtest = function(tests, totaltests, callback) {
+            console.log("Runtest called");
+            $.post("http://localhost:9090/Services/RunTest/",
+                {test: tests[0]},
+                function(data) {
+                    var run_single_pcnt = 0;
+                    var run_overall_pcnt = 0;
+                    console.log(tests);
+                    //callback(tests, totaltests, callback);
+                    
+                },
+                "json"
+            );
+        };
+        
         // Start running tests
         $.post("http://localhost:9090/Services/GetTestsBySuiteName/",
             {suite: testsuitename},
@@ -431,7 +452,15 @@ function StartRunTests() {
                                 }
                             }
                         }
-                        console.log(total);
+                        for(var group in testdata.results) {
+                            for(var suite in testdata.results[group]) {
+                                for(var project in testdata.results[group][suite]) {
+                                    runtest(testdata.results[group][suite][project], total, runtest);
+                                }
+                            }
+                        }
+                        
+                        //$('#run_overall');
                     },
                     "json"
                 );

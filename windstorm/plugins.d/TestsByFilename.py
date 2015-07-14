@@ -27,7 +27,13 @@ def find(path):
     # use SOMETHING for now
     if isinstance(path, list):
         # run on multiple paths and extend 
-        return ["/home/user/TestExampleFound.py"]
+        return ["/home/user/TestExampleFound1.py",
+                "/home/user/TestExampleFound2.py",
+                "/home/user/TestExampleFound3.py",
+                "/home/user/TestExampleFound4.py"]
     
     else:
-        return ["/home/user/TestExampleFound.py"]
+        return ["/home/user/TestExampleFound1.py",
+                "/home/user/TestExampleFound2.py",
+                "/home/user/TestExampleFound3.py",
+                "/home/user/TestExampleFound4.py"]

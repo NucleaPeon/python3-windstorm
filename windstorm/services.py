@@ -252,12 +252,8 @@ class Services(daemon.Daemon):
         
         return tests
     
-    def RunTests(self, tests=[], **kwargs):
-        results = []
-        for t in tests:
-            results.append(t)
-            
-        return results
+    def RunTest(self, test=None, **kwargs):
+        return None
     
 def start(pidfile, in_dir="/"):
     try:    
