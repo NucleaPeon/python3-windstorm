@@ -54,12 +54,18 @@
             </div>
             <div class="modal-body row">
                 <div class="col-md-12">
+                    <div class="input-group col-md-12">
+                        <span class="input-group-addon glyphicon glyphicon-folder-open"></span>
+                        <input type="text" class="form-control " onclick="alert('Add files');" placeholder="Add Project Files/Folders" 
+                               ondrop="ProjectUploadFolder(event);" id="projectuploadfolder"/>
+                    </div>
+                    <br />
                     <div class="accordion" id="projectfilelisting">
                         <div class="accordion-group">
                             <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#projectfilelisting" href="#collapsepfl">
-                                Service Dependencies
-                            </a>
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#projectfilelisting" href="#collapsepfl">
+                                    File List:
+                                </a>
                             </div>
                             <div id="collapsepfl" class="accordion-body collapse in">
                                 <div class="accordion-inner" id="list_projectfiles">
@@ -69,8 +75,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                <br /><button type="button" class="btn btn-default col-md-12" onclick="alert('Add files');">Add Project Files/Folders</button></div>
             </div>
             <hr>
             <!-- Dependencies -->

@@ -108,6 +108,28 @@ function ProjectSettingsModal(title) {
     $('#modal-header-title').html(title);
 }
 
+function ProjectUploadFolder(event) {
+    event.preventDefault();
+    var data = event.dataTransfer.getData("text");
+    data = data.split("\n");
+    var filename = null;
+    for (d in data) {
+        $('#list_projectfiles')
+            .append($("<div>").addClass("input-group projectfilepath").attr("id", "filename" + d)
+                .append($("<span>").addClass("input-group-addon glyphicon glyphicon-file"))
+                .append($("<input>").prop("type", "text").prop("disabled", true).addClass("form-control").val(data[d]))
+                .append($("<span>").addClass("input-group-addon btn btn-default glyphicon glyphicon-remove")
+                    .on("click", function() {
+                        console.log("Remove");
+                        $(this).parent().remove();
+                    })
+                ).css("padding-bottom", "1em"));
+            
+            
+            //.html(data[d]));
+    }
+}
+
 function GenerateSoftwareSummary(body, heading, image) {
     var img = (image === undefined) ? "/imgs/folder-tar.png" : image;
     var header = (heading === undefined) ? "Untitled Heading" : heading;

@@ -60,7 +60,6 @@ class Services(daemon.Daemon):
         # Add plugins directory
         sys.path.insert(0, os.path.join(os.getcwd(), "plugins.d"))
         # Information Cache:
-        """
         self.projects = {
             'TestProject' : {
                 'title': "TestProject",
@@ -73,6 +72,7 @@ class Services(daemon.Daemon):
                 }
             }
         }
+        """
         self.testsuites = {
             'TestTestSuite': {
                 "projects": ["TestProject"],
@@ -98,7 +98,7 @@ class Services(daemon.Daemon):
             }
         }
         """
-        self.projects = {}
+        #self.projects = {}
         self.testsuites = {}
         self.testgroups = {}
         self.testresults = {}
