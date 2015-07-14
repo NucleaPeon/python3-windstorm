@@ -91,8 +91,9 @@ function AppendProjectPanel(title) {
 }
 
 function DeleteSoftware(title) {
+    console.log(title);
     $.post('http://localhost:9090/Services/DeleteProject/',
-           {'title': JSON.stringify(title)},
+           {'title': title},
            function(project) {
                if (project.results.deleted == "true") {
                    $('#' + title).remove();
@@ -104,7 +105,6 @@ function DeleteSoftware(title) {
 
 function ProjectSettingsModal(title) {
     $('#modal-header-title').html(title);
-    
 }
 
 function GenerateSoftwareSummary(body, heading, image) {

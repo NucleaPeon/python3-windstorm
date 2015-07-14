@@ -161,20 +161,25 @@ class Services(daemon.Daemon):
                     logging.info("{} found in groups and removed".format(s))
                     if s in self.testsuites:
                         del self.testsuites[s]
+
                     deltests.append(s)
             
         return dict(deleted=deltests)
     
     def SaveProject(self, project=None, **kwargs):
         if not project is None:
-            project = project.decode('utf-8')
+            project = json.loads(project[0].decode('utf-8'))
+            
+        if not project['title'] in self.projects:
+            self.projects[project['title']] = {}
             
         self.projects[project['title']] = project
         return dict(project=self.projects[project['title']])
     
     def DeleteProject(self, title=None, **kwargs):
         if not title is None:
-            title = title.decode('utf-8')
+            title = title[0].decode('utf-8')
+            
         retval = False
         if title in self.projects:
             del self.projects[title]
@@ -244,8 +249,6 @@ class Services(daemon.Daemon):
         
         suite = suite[0].decode("utf-8")
         projects = list(map(lambda x: x.decode("utf-8"), projects))
-        logging.info(suite)
-        logging.info(projects)
         self.testsuites[suite]["projects"] = projects
     
     def GetGroupTestFilenames(self, group=None, **kwargs):
