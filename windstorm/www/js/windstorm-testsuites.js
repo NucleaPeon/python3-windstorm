@@ -411,29 +411,40 @@ function StartRunTests() {
                 .append($("<div>").addClass("progress-bar").attr({
                     "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
-                }).html("0%").css("color", "black"))
+                }).css("color", "black"))
              )
             .append($("<div>").addClass("progress")
                 .append($("<div>").addClass("progress-bar").attr({
                     "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_single"
-                }).html("0%").css("color", "black"))
+                }).css("color", "black"))
              );
             
         // Define async callback methods for "synchronous-like" functionality loops
         var runtest = function(tests, totaltests, callback) {
-            console.log("Runtest called");
+            $('#run_overall').css("width",  (((totaltests-tests.length) / totaltests) * 100) + "%");
+            if (tests.length <= 0) {
+                return;
+            }
+            /**
+             * tests: list of filename/paths to test modules
+             * totaltests: length of every test module being run (does not change)
+             * callback: function to call once one test module has run
+             */
             $.post("http://localhost:9090/Services/RunTest/",
                 {test: tests[0]},
                 function(data) {
-                    var run_single_pcnt = 0;
-                    var run_overall_pcnt = 0;
-                    console.log(tests);
-                    //callback(tests, totaltests, callback);
+                    console.log("Runtest called");
+                    $('#run_overall').attr("aria-valuenow", 1);
                     
                 },
                 "json"
-            );
+            ).done(function(data) {
+                $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
+                // Recall this method but with the first element chopped. This means
+                // our width will increase based on its equation until it reaches 100.
+                callback(tests.slice(1), totaltests, callback);
+            });
         };
         
         // Start running tests
@@ -455,7 +466,8 @@ function StartRunTests() {
                         for(var group in testdata.results) {
                             for(var suite in testdata.results[group]) {
                                 for(var project in testdata.results[group][suite]) {
-                                    runtest(testdata.results[group][suite][project], total, runtest);
+                                    runtest(testdata.results[group][suite][project], 
+                                            total, runtest);
                                 }
                             }
                         }
