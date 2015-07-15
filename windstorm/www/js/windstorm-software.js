@@ -1,17 +1,28 @@
 $(document).on("ready", function() {
     $("#AddNewSoftware").on("shown.bs.modal", function() {
+        console.log("Adding click on SaveSoftwareBtn");
+        $("#SaveSoftwareBtn").on("click", function() {
+             SaveProject();
+             return false;
+        });
         $('#mpname').focus();
         var func = $(document).keypress(function(e) {
             if(e.which == 13) {
+                console.log("Adding enter on SaveSoftwareBtn");
                 $('#SaveSoftwareBtn').click();
                 $('#AddNewSoftware').modal("hide");
+                return false;
             }
         });
     });
+    
     $("#AddNewSoftware").on("hidden.bs.modal", function() {
-        delete $(document).keypress();
+        console.log("removing enter input for SaveSoftwareBtn");
+        $(document).off("keypress");
         $("#mpname").val("");
         $('#list_projectfiles').empty();
+        console.log("removing click input for SaveSoftwareBtn");
+        $("#SaveSoftwareBtn").off("click");
     });
 });
 
@@ -20,25 +31,28 @@ function AddProject() {
 }
 
 function SaveProject() {
-    if (($('#mpname').val() == "") || ($('#mpname').val() === undefined)) {
+    var val = $('#mpname').val();
+    if ((val == "") || (val === undefined)) {
         // Highlight the field in red background by adding in required class
         return undefined
     }
-    console.log($('#mpname').val().replace(" ", "_"))
-    // TODO: Validation of title
-    var projname = $('#mpname').val().replace(" ", "_");
-    $.post('http://localhost:9090/Services/SaveProject/', 
-           {title: projname},
-           function(data) {
-               console.log(projname);
-               $('#mpname').val('');
-               if ($('#Warn_NoProject').length > 0) {
-                    $('#Warn_NoProject').remove();
-               }
-               AppendProjectPanel(data.results);
-               $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.title));
-           }
-    );
+    if ($("#" + val).length == 0) {
+        
+        // TODO: Validation of title
+        var projname = $('#mpname').val().replace(" ", "_");
+        $.post('http://localhost:9090/Services/SaveProject/', 
+            {title: projname},
+            function(data) {
+                $('#mpname').val('');
+                if ($('#Warn_NoProject').length > 0) {
+                        $('#Warn_NoProject').remove();
+                }
+                AppendProjectPanel(data.results);
+                $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.title));
+                return false;
+            }
+        );
+    }
 }
 
 function UpdateProject() {
