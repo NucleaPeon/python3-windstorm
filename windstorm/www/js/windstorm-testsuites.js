@@ -135,11 +135,14 @@ function GetProjects() {
            {},
            function(data) {
                jQuery.ajaxSettings.traditional = true;
+               console.log(data.results.length);
                for (var i=0; i<data.results.length; i++) {
-                   var name = data.results[i];
-                   if ($('#' + data.results[i]).length == 0) {
+                   var name = data.results[i].title;
+                   console.log($('#projdata' + name).length);
+                   if ($('#projdata' + name).length == 0) {
+                       console.log("projdata " + name + " has no elements");
                         $("#projectlisting")
-                            .append($("<div>").attr("id", name).addClass("projectdata")
+                            .append($("<div>").attr("id", "projdata" + name).addClass("projectdata")
                                 .append($("<div>").addClass("input-group")
                                     .append($("<span>").addClass("input-group-addon")
                                         .append($("<input>").addClass("checkbox").attr({
