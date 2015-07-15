@@ -116,7 +116,7 @@ class Services(daemon.Daemon):
         tornado.ioloop.IOLoop.current().start()
     
     def GetProjects(self, **kwargs):
-        return list(self.projects.keys())
+        return list(self.projects.values())
     
     def GetProject(self, name=None, **kwargs):
         if not name is None:
@@ -191,6 +191,7 @@ class Services(daemon.Daemon):
         if not title in self.projects:
             self.projects[title] = {
                 "title": title,
+                "description": "",
                 "plugin": "",
                 "depends": {
                     "services": [],
@@ -215,10 +216,14 @@ class Services(daemon.Daemon):
             
         return dict(deleted=json.dumps(retval))
     
-    def UpdateProject(self, project=None, files=None, **kwargs):
+    def UpdateProject(self, project=None, files=None, 
+                      description=None, **kwargs):
         if project is None:
             return project
         
+        description = "" if description is None else description[0].decode("utf-8")
+        description = description.replace("\n", "<br />")
+            
         # Remove file:// from path
         if not files is None:
             files = map(lambda x: x.decode("utf-8"), files)
@@ -254,6 +259,7 @@ class Services(daemon.Daemon):
                 del f
                 
         self.projects[project]["files"] = files
+        self.projects[project]["description"] = description
         self.projects[project]["size"] = int(Decimal(size/Decimal(1000000)).quantize(Decimal('1.'), rounding=ROUND_UP))
        
         return self.projects[project]

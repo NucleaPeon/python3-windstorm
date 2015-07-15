@@ -35,7 +35,7 @@ function SaveProject() {
                if ($('#Warn_NoProject').length > 0) {
                     $('#Warn_NoProject').remove();
                }
-               AppendProjectPanel(data.results.title);
+               AppendProjectPanel(data.results);
                $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.title));
            }
     );
@@ -53,14 +53,15 @@ function UpdateProject() {
     jQuery.ajaxSettings.traditional = true;
     $.post('http://localhost:9090/Services/UpdateProject/',
            {project: $('#modal-header-title').html(),
-            files: items},
+            files: items,
+            description: $('#projectdescription').val()},
            function(data) {
                $("#Messages").append($("<li>").addClass("list-group-item").html("Updated Project" + $('#modal-header-title').html()));
                $("#numberoffiles").val(data.results.files.length);
                $('#list_projectfiles').empty();
                GenFileBlock(data.results.files);
                $("#projectsize").val(data.results.size);
-               
+               $('#mediabody' + data.results.title).html(data.results.description);
            },
            "json");
 }
@@ -82,6 +83,7 @@ function GetProjects(callback) {
 
 function DisplayProjects(projects) {
     for (var i=0; i < projects.results.length; i++) {
+        console.log(projects.results[i]);
         AppendProjectPanel(projects.results[i]);
     }
     if (projects.results.length > 0) {
@@ -96,18 +98,18 @@ function DisplayProjects(projects) {
     }
 }
 
-function AppendProjectPanel(title) {
+function AppendProjectPanel(project) {
     // Check to ensure project doesn't already exist before appending it
-    if ($('#' + title).length == 0) {
-        $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", title)
-            .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
-                DeleteSoftware(title);
+    if ($('#' + project.title).length == 0) {
+        $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", project.title)
+            .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + project.title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
+                DeleteSoftware(project.title);
             })).on("click", function() { 
                 return false; // Fix for issue where clicking on header invokes body onclick event
             }))
             .append($("<div>").addClass("panel-body").append(
-                GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project").on("click", function() { 
-                    ProjectSettingsModal(title, function() { $('#SoftwareDetails').modal("show") });
+                GenerateSoftwareSummary(project.title, project.description, "Project").on("click", function() { 
+                    ProjectSettingsModal(project.title, function() { $('#SoftwareDetails').modal("show") });
                     return false; // Required to stop modal window from hiding immediately
                 }
             )))
@@ -129,6 +131,8 @@ function DeleteSoftware(title) {
 }
 
 function ProjectSettingsModal(title, callback) {
+    console.log("ProjectSettingsModal");
+    console.log(title);
     $('#modal-header-title').html(title);
     $.post('http://localhost:9090/Services/GetProject/',
            {name: title},
@@ -166,15 +170,15 @@ function ProjectUploadFolder(event) {
     GenFileBlock(data);
 }
 
-function GenerateSoftwareSummary(body, heading, image) {
+function GenerateSoftwareSummary(title, body, heading, image) {
     var img = (image === undefined) ? "/imgs/folder-tar.png" : image;
     var header = (heading === undefined) ? "Untitled Heading" : heading;
     return $("<div>").addClass("media")
         .append($("<div>").addClass("media-left media-middle")
             .append($("<a>").attr("href", "#")
-                .append('<img class="media-object" src="' + img + '" alt="' + img + '">'))
-         ).append($("<div>").addClass("media-body")
-             .append($("<h4>").addClass("media-heading").html(header))
-             .append(body)
+                .append('<img class="media-object" src="' + img + '" alt="' + img + '">')))
+        .append($("<div>").addClass("media-body")
+            .append($("<h4>").addClass("media-heading").html(header).attr("id", "mediahead" + title))
+            .append($("<div>").attr("id", "mediabody" + title).html(body))
         );
 }
