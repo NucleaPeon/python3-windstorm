@@ -11,6 +11,7 @@ $(document).on("ready", function() {
     $("#AddNewSoftware").on("hidden.bs.modal", function() {
         delete $(document).keypress();
         $("#mpname").val("");
+        $('#list_projectfiles').empty();
     });
 });
 
@@ -23,17 +24,19 @@ function SaveProject() {
         // Highlight the field in red background by adding in required class
         return undefined
     }
+    console.log($('#mpname').val().replace(" ", "_"))
     // TODO: Validation of title
     var projname = $('#mpname').val().replace(" ", "_");
     $.post('http://localhost:9090/Services/SaveProject/', 
-           {'project': JSON.stringify({'title': projname})},
+           {title: projname},
            function(data) {
+               console.log(projname);
                $('#mpname').val('');
                if ($('#Warn_NoProject').length > 0) {
                     $('#Warn_NoProject').remove();
                }
-               AppendProjectPanel(data.results.project.title);
-               $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.project.title));
+               AppendProjectPanel(data.results.title);
+               $("#Messages").append($("<li>").addClass("list-group-item").html("Saved project " + data.results.title));
            }
     );
 }
@@ -46,12 +49,18 @@ function UpdateProject() {
     for (var i=0; i < elements.length; i++) {
         items.push(elements[i].value);
     }
+    ////////
     jQuery.ajaxSettings.traditional = true;
     $.post('http://localhost:9090/Services/UpdateProject/',
            {project: $('#modal-header-title').html(),
             files: items},
            function(data) {
                $("#Messages").append($("<li>").addClass("list-group-item").html("Updated Project" + $('#modal-header-title').html()));
+               $("#numberoffiles").val(data.results.files.length);
+               $('#list_projectfiles').empty();
+               GenFileBlock(data.results.files);
+               $("#projectsize").val(data.results.size);
+               
            },
            "json");
 }
@@ -98,8 +107,7 @@ function AppendProjectPanel(title) {
             }))
             .append($("<div>").addClass("panel-body").append(
                 GenerateSoftwareSummary("blah blah blah blah blah<br />Some more blah", "Project").on("click", function() { 
-                    ProjectSettingsModal(title);
-                    $('#SoftwareDetails').modal("show");
+                    ProjectSettingsModal(title, function() { $('#SoftwareDetails').modal("show") });
                     return false; // Required to stop modal window from hiding immediately
                 }
             )))
@@ -109,9 +117,8 @@ function AppendProjectPanel(title) {
 }
 
 function DeleteSoftware(title) {
-    console.log(title);
     $.post('http://localhost:9090/Services/DeleteProject/',
-           {'title': title},
+           {title: title},
            function(project) {
                if (project.results.deleted == "true") {
                    $('#' + title).remove();
@@ -121,21 +128,28 @@ function DeleteSoftware(title) {
            });
 }
 
-function ProjectSettingsModal(title) {
+function ProjectSettingsModal(title, callback) {
     $('#modal-header-title').html(title);
+    $.post('http://localhost:9090/Services/GetProject/',
+           {name: title},
+           function(project) {
+               $('#numberoffiles').val(project.results.files.length);
+               $('#projectsize').val(project.results.size);
+               
+           })
+    // Get project details based on title
+    // fill in files, size and # of files inputs
+    callback();
 }
 
-function ProjectUploadFolder(event) {
-    event.preventDefault();
-    var data = event.dataTransfer.getData("text");
-    data = data.split("\n");
+function GenFileBlock(data) {
     var filename = null;
     for (d in data) {
         if ((data[d] != "") && (data[d] !== undefined)) {
             $('#list_projectfiles')
                 .append($("<div>").addClass("input-group projectfilepath").attr("id", "filename" + d)
                     .append($("<span>").addClass("input-group-addon glyphicon glyphicon-file"))
-                    .append($("<input>").prop("type", "text").prop("disabled", true).addClass("form-control").val(data[d]))
+                    .append($("<input>").prop("type", "text").prop("disabled", true).addClass("form-control filevalue").val(data[d]))
                     .append($("<span>").addClass("input-group-addon btn btn-default glyphicon glyphicon-remove")
                         .on("click", function() {
                             $(this).parent().remove();
@@ -143,6 +157,13 @@ function ProjectUploadFolder(event) {
                     ).css("padding-bottom", "1em"));
         }
     }
+}
+
+function ProjectUploadFolder(event) {
+    event.preventDefault();
+    var data = event.dataTransfer.getData("text");
+    data = data.split("\n");
+    GenFileBlock(data);
 }
 
 function GenerateSoftwareSummary(body, heading, image) {

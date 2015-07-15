@@ -9,6 +9,7 @@ import mimetypes
 import json
 import inspect
 import importlib
+from decimal import *
 try:
     import tornado
     import tornado.web
@@ -60,6 +61,7 @@ class Services(daemon.Daemon):
         # Add plugins directory
         sys.path.insert(0, os.path.join(os.getcwd(), "plugins.d"))
         # Information Cache:
+        """
         self.projects = {
             'TestProject' : {
                 'title': "TestProject",
@@ -69,10 +71,11 @@ class Services(daemon.Daemon):
                     'services': [],
                     'files': [],
                     'windstorminstances': []
-                }
+                },
+                'files': [], # Cached version, 
+                'size': 0
             }
         }
-        """
         self.testsuites = {
             'TestTestSuite': {
                 "projects": ["TestProject"],
@@ -98,7 +101,7 @@ class Services(daemon.Daemon):
             }
         }
         """
-        #self.projects = {}
+        self.projects = {}
         self.testsuites = {}
         self.testgroups = {}
         self.testresults = {}
@@ -114,6 +117,14 @@ class Services(daemon.Daemon):
     
     def GetProjects(self, **kwargs):
         return list(self.projects.keys())
+    
+    def GetProject(self, name=None, **kwargs):
+        if not name is None:
+            name = name[0].decode('utf-8')
+            if not self.projects.get(name) is None:
+                return self.projects[name]
+            
+        return None
     
     def GetProjectPathsByName(self, name=None, **kwargs):
         if not name is None:
@@ -172,15 +183,25 @@ class Services(daemon.Daemon):
             
         return dict(deleted=deltests)
     
-    def SaveProject(self, project=None, **kwargs):
-        if not project is None:
-            project = json.loads(project[0].decode('utf-8'))
+    def SaveProject(self, title=None, **kwargs):
+        if not title is None:
+            title = title[0].decode('utf-8')
             
-        if not project['title'] in self.projects:
-            self.projects[project['title']] = {}
+        logging.info(title)
+        if not title in self.projects:
+            self.projects[title] = {
+                "title": title,
+                "plugin": "",
+                "depends": {
+                    "services": [],
+                    "files": [],
+                    "windstorminstances": []
+                },
+                "files": [],
+                "size": 0
+            }
             
-        self.projects[project['title']] = project
-        return dict(project=self.projects[project['title']])
+        return self.projects[title]
     
     def DeleteProject(self, title=None, **kwargs):
         if not title is None:
@@ -188,15 +209,54 @@ class Services(daemon.Daemon):
             
         retval = False
         if title in self.projects:
+            logging.info("Found project {} to delete".format(title))
             del self.projects[title]
             retval = True
             
         return dict(deleted=json.dumps(retval))
     
     def UpdateProject(self, project=None, files=None, **kwargs):
-        logging.info(project)
-        logging.info(files)
-        return None
+        if project is None:
+            return project
+        
+        # Remove file:// from path
+        if not files is None:
+            files = map(lambda x: x.decode("utf-8"), files)
+            files = list(set(map(lambda x: x[7:] if x[0:7] == "file://" else x, files)))
+            
+        else:
+            files = []
+        
+        def get_size(d):
+            size = Decimal(0)
+            for root, _dir, _file in os.walk(d):
+                for f in _file:
+                    size = Decimal(os.path.getsize(os.path.join(root, f))) + size
+                
+            return size
+                
+        project = project[0].decode("utf-8")
+        if not project in self.projects:
+            self.SaveProject(title=[bytes(project, "utf-8")])
+            
+        size = Decimal(0)
+        for f in files:
+            if os.path.exists(f):
+                try:
+                    size += get_size(f) if os.path.isdir(f) else Decimal(os.path.getsize(f))
+                    
+                except PermissionError as pE:
+                    logging.error("Permission denied to {}, {}".format(f, pE))
+                    continue
+                    
+            else:
+                logging.warning("File {} not found, removing".format(f))
+                del f
+                
+        self.projects[project]["files"] = files
+        self.projects[project]["size"] = int(Decimal(size/Decimal(1000000)).quantize(Decimal('1.'), rounding=ROUND_UP))
+       
+        return self.projects[project]
     
     def LoadTestsByPlugin(self, plugin=None, path=None, **kwargs):    
         if not plugin is None:
@@ -305,6 +365,7 @@ class Services(daemon.Daemon):
     
     def CountTestModulesInFile(self, test=None, **kwargs):
         return 1
+    
     
 def start(pidfile, in_dir="/"):
     try:    

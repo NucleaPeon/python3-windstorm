@@ -11,11 +11,26 @@
 {% end %}
 
 {% block main_content %}
-Home
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">Test And Deployment Configuration Overview</div>
+  <div class="panel-body">
+    <p>Windstorm: Gentle Breeze (Version 0.1 Development)</p>
+  </div>
+  <!-- Table -->
+  <table class="table">
+    <tr>
+        <td>Col1</td><td>Col2</td><td>Col3</td>
+    </tr>
+    <tr>
+        <td>Val</td><td>Val</td><td>Val</td>
+    </tr>
+  </table>
+</div>
 {% end %}
 
 {% block customjs %}
 $(document).ready( function() {
-    console.log("Ready for home summary");
+    // Go through and add each component's information into this table: test suites, groups, projects, plugins, etc. with possible quick-adds
 });
 {% end %}
