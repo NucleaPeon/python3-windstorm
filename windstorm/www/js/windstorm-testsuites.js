@@ -103,6 +103,7 @@ function DeleteTestSuites() {
            {"suites": suitelbls,
             "group": "TestTestGroup"},
            function(data) {
+               console.log("TODO");
                console.log(data);
            });
         suites.remove();
@@ -201,7 +202,6 @@ function CountTestsForProject(name, callback) {
         url: 'http://localhost:9090/Services/GetProjectsByName/',
         data: {name: name},
         success: function(project) {
-            console.log(name + ": name of suite");
             $.ajax({
                 type: "POST",
                 url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
@@ -271,7 +271,6 @@ function AppendTestSuite(testsuitename) {
                                             $('#ProjectSelect').modal("show");
                                             // Add accept button event to update test values
                                             $('#accept_ts_btn').on("click", function() {
-                                                console.log("Clicked");
                                                 UpdateProjectTests(testsuitename);
                                             })
                                         })
@@ -327,27 +326,22 @@ function UpdateProjectTests(testsuitename, successcb) {
      * Requests a refreshed test view on the main testsuite web page
      * in the suite's accordion elements.
      */
-    console.log("Update Project Tests " + testsuitename);
     var projects = $('#projectlisting').children();
     var testsFromProjects = 0;
     var projid = null;
     var checked = [];
     
     var checkprojects = function(current_checked, callback) {
-        console.log("Check projects: ");
         if ($(".projectdata .checkbox:checked").length >= current_checked) {
-            console.log("Calling back from checkprojects");
             callback();
         }
     }
     
     var success = function(checked, testsuitename) {
-        console.log("Success, update test suite " + testsuitename);
         $.post("http://localhost:9090/Services/UpdateTestSuite/",
             {projects: checked,
             suite: testsuitename},
             function(data) {
-                console.log("Succss on UpdateTestSuite");
             },
             "json"
         ).done(function(data) {
@@ -357,14 +351,12 @@ function UpdateProjectTests(testsuitename, successcb) {
     
     var updateproject = function(project) {
         checked.push(project.attr("proj"));
-        console.log("Project " + project.attr("proj") + " pushed");
-        CountTestsForProject(project.id, function(testCount, tests) {
+        CountTestsForProject(project.attr("id"), function(testCount, tests) {
             testsFromProjects += Number(testCount)
-            $("#badge" + project.id).html(testCount);
+            $("#badge" + project.attr("id")).html(testCount);
             $('#badge' + testsuitename).html(testsFromProjects);
             $('#ProjectSelect').modal("hide");
             $('#tests' + testsuitename).append("Test");
-            console.log("Update checking length of current projects: " + checked.length);
             checkprojects(checked.length, function() { 
                 if (successcb === undefined) {
                     success(checked, testsuitename);    
@@ -377,7 +369,6 @@ function UpdateProjectTests(testsuitename, successcb) {
     
     var checkeditems = $(".projectdata .checkbox:checked")
     for(var i=0; i < checkeditems.length; i++) {
-        console.log(checkeditems[i]);
         updateproject($(checkeditems[i]));
     }
     
@@ -400,11 +391,8 @@ function RefreshTestViewInSuite(testsuitename) {
                     testcount += Number(numtests);
                     testlist = [];
                     for (var j=0; j < tests.length; j++) {
-                        console.log(tests[j]);
                         testlist.push($("<li>").addClass("list-group-item").html(tests[j]))
                     }
-                    console.log("Refresh Tests View in Suite");
-                    console.log(data.results);
                     $('#tstests' + testsuitename)
                         .append($("<div>").addClass("panel panel-default")
                             .append($("<div>").addClass("panel-heading")
@@ -431,6 +419,7 @@ function RefreshTestViewInSuite(testsuitename) {
                 });
             }
             for (var i=0; i<data.results.additional.length; i++) {
+                console.log("TODO");
                 console.log(data.results.additional[i]);
             }
             $('#collapse' + testsuitename).collapse('show');
@@ -481,7 +470,6 @@ function StartRunTests(completecallback) {
             $.post("http://localhost:9090/Services/RunTest/",
                 {test: tests[0]},
                 function(data) {
-                    console.log("Runtest called");
                     $('#run_overall').attr("aria-valuenow", 1);
                     
                 },
@@ -495,32 +483,26 @@ function StartRunTests(completecallback) {
         };
         
         // Start running tests
-        $.post("http://localhost:9090/Services/GetTestsBySuiteName/",
-            {suite: testsuitename},
-            function(data) {
-                $.post("http://localhost:9090/Services/GetGroupTestFilenames/",
-                    {group: "TestTestGroup"}, /** FIXME: Hardcode for now **/
-                    function(testdata) {
-                        // Calculate total tests
-                        var total = 0;
-                        for(var group in testdata.results) {
-                            for(var suite in testdata.results[group]) {
-                                for(var project in testdata.results[group][suite]) {
-                                    total += testdata.results[group][suite][project].length;
-                                }
-                            }
+        $.post("http://localhost:9090/Services/GetSuiteTestFilenames/",
+            {suite: testsuitename}, /** FIXME: Hardcode for now **/
+            function(testdata) {
+                // Calculate total tests
+                var total = 0;
+                for(var group in testdata.results) {
+                    for(var suite in testdata.results[group]) {
+                        for(var project in testdata.results[group][suite]) {
+                            total += testdata.results[group][suite][project].length;
                         }
-                        for(var group in testdata.results) {
-                            for(var suite in testdata.results[group]) {
-                                for(var project in testdata.results[group][suite]) {
-                                    runtest(testdata.results[group][suite][project], 
-                                            total, runtest);
-                                }
-                            }
+                    }
+                }
+                for(var group in testdata.results) {
+                    for(var suite in testdata.results[group]) {
+                        for(var project in testdata.results[group][suite]) {
+                            runtest(testdata.results[group][suite][project], 
+                                    total, runtest);
                         }
-                    },
-                    "json"
-                );
+                    }
+                }
             },
             "json"
         );

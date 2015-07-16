@@ -378,13 +378,16 @@ class Services(daemon.Daemon):
         suite = suite[0].decode("utf-8")
         tests = {suite: {}}
         if suite in self.testsuites:
-            projects = self.testsuites[s]["projects"]
+            projects = self.testsuites[suite]["projects"]
             if projects:
                 # Run through plugins to get filenames
                 for p in projects:
                     for pth in self.projects[p]['files']:
                         tests[suite][p] = self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
                                                             path=[bytes(pth, "utf-8")])
+                        
+            if self.testsuites[suite]["additional"]:
+                logging.warning("TODO: Additional files not implemented")
                         
         return tests
     
