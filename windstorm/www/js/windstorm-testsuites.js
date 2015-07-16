@@ -20,7 +20,7 @@ $(document).on("ready", function() {
     });
     
     $("#AddTestSuite").on("hidden.bs.modal", function() {
-        delete $(document).keypress();
+        $(document).off("keypress");
         $("#tsname").val("");
     });
     
@@ -135,10 +135,8 @@ function GetProjects() {
            {},
            function(data) {
                jQuery.ajaxSettings.traditional = true;
-               console.log(data.results.length);
                for (var i=0; i<data.results.length; i++) {
                    var name = data.results[i].title;
-                   console.log($('#projdata' + name).length);
                    if ($('#projdata' + name).length == 0) {
                        console.log("projdata " + name + " has no elements");
                         $("#projectlisting")
@@ -200,7 +198,6 @@ function CountTestsForProject(name, callback) {
      * the method with the number of tests it found as the first parameter
      * and list of test names as second.
      */
-    var plugin = "TestsByFilename";
     $.ajax({
         type: "POST",
         url: 'http://localhost:9090/Services/GetProjectsByName/',

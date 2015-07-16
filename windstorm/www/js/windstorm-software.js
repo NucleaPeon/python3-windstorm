@@ -1,6 +1,5 @@
 $(document).on("ready", function() {
     $("#AddNewSoftware").on("shown.bs.modal", function() {
-        console.log("Adding click on SaveSoftwareBtn");
         $("#SaveSoftwareBtn").on("click", function() {
              SaveProject();
              return false;
@@ -8,7 +7,6 @@ $(document).on("ready", function() {
         $('#mpname').focus();
         var func = $(document).keypress(function(e) {
             if(e.which == 13) {
-                console.log("Adding enter on SaveSoftwareBtn");
                 $('#SaveSoftwareBtn').click();
                 $('#AddNewSoftware').modal("hide");
                 return false;
@@ -17,11 +15,9 @@ $(document).on("ready", function() {
     });
     
     $("#AddNewSoftware").on("hidden.bs.modal", function() {
-        console.log("removing enter input for SaveSoftwareBtn");
         $(document).off("keypress");
         $("#mpname").val("");
         $('#list_projectfiles').empty();
-        console.log("removing click input for SaveSoftwareBtn");
         $("#SaveSoftwareBtn").off("click");
     });
 });
@@ -37,7 +33,6 @@ function SaveProject() {
         return undefined
     }
     if ($("#" + val).length == 0) {
-        
         // TODO: Validation of title
         var projname = $('#mpname').val().replace(" ", "_");
         $.post('http://localhost:9090/Services/SaveProject/', 
@@ -97,7 +92,6 @@ function GetProjects(callback) {
 
 function DisplayProjects(projects) {
     for (var i=0; i < projects.results.length; i++) {
-        console.log(projects.results[i]);
         AppendProjectPanel(projects.results[i]);
     }
     if (projects.results.length > 0) {
@@ -123,7 +117,10 @@ function AppendProjectPanel(project) {
             }))
             .append($("<div>").addClass("panel-body").append(
                 GenerateSoftwareSummary(project.title, project.description, "Project").on("click", function() { 
-                    ProjectSettingsModal(project.title, function() { $('#SoftwareDetails').modal("show") });
+                    ProjectSettingsModal(project.title, function() { 
+                        GenFileBlock(project.files);
+                        $('#SoftwareDetails').modal("show");
+                    });
                     return false; // Required to stop modal window from hiding immediately
                 }
             )))

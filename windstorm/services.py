@@ -192,7 +192,7 @@ class Services(daemon.Daemon):
             self.projects[title] = {
                 "title": title,
                 "description": "",
-                "plugin": "",
+                "plugin": "TestByFilename",
                 "depends": {
                     "services": [],
                     "files": [],
