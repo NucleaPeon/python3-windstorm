@@ -149,17 +149,18 @@ class Services(daemon.Daemon):
         if not suite is None:
             suite = suite[0].decode("utf-8")
             
-        if not group is None:
-            group = group[0].decode("utf-8")
             
         if not suite in self.testsuites:
             self.testsuites[suite] = {"projects": [], "additional": {}}
             
-        if self.testgroups.get(group) is None:
-            self.testgroups[group] = [suite]
         
-        else:
-            self.testgroups[group].append(suite)
+        if not group is None:
+            group = group[0].decode("utf-8")
+            if not self.testgroups.get(group) is None:
+                self.testgroups[group].append(suite)
+            
+            else:
+                self.testgroups[group] = [suite]
     
     def DeleteTestSuites(self, suites=None, group=None, **kwargs):
         deltests = []
@@ -192,7 +193,7 @@ class Services(daemon.Daemon):
             self.projects[title] = {
                 "title": title,
                 "description": "",
-                "plugin": "TestByFilename",
+                "plugin": "TestsByFilename",
                 "depends": {
                     "services": [],
                     "files": [],
@@ -304,6 +305,7 @@ class Services(daemon.Daemon):
         # Returns {project: [], additional: {}}
         if not suite is None:
             suite = suite[0].decode('utf-8')
+            logging.info("Finding Test Suite {}".format(suite))
             if suite in self.testsuites:
                 return self.testsuites[suite]
             
@@ -356,7 +358,7 @@ class Services(daemon.Daemon):
                 if projects:
                     # Run through plugins to get filenames
                     for p in projects:
-                        for pth in self.projects[p]['paths']:
+                        for pth in self.projects[p]['files']:
                             tmptests.extend(self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
                                                                 path=[bytes(pth, "utf-8")]))
                             
@@ -365,6 +367,24 @@ class Services(daemon.Daemon):
                                             
         
         return tests
+    
+    def GetSuiteTestFilenames(self, suite=None, **kwargs):
+        if suite is None:
+            return None
+        
+        suite = suite[0].decode("utf-8")
+        tests = {suite: {}}
+        if suite in self.testsuites:
+            projects = self.testsuites[s]["projects"]
+            if projects:
+                # Run through plugins to get filenames
+                for p in projects:
+                    for pth in self.projects[p]['files']:
+                        tests[suite][p] = self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
+                                                            path=[bytes(pth, "utf-8")])
+                        
+        return tests
+    
     
     def RunTest(self, test=None, **kwargs):
         return None

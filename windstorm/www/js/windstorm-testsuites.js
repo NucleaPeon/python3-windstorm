@@ -97,7 +97,6 @@ function DeleteTestSuites() {
     for (var i=0; i < suites.length; i++)  {
         suitelbls.push(suites[i].id);
     }
-    console.log(suitelbls);
     if (suitelbls.length > 0) {
         jQuery.ajaxSettings.traditional = true;
         $.post('http://localhost:9090/Services/DeleteTestSuites/',
@@ -198,6 +197,7 @@ function CountTestsForProject(name, callback) {
      * the method with the number of tests it found as the first parameter
      * and list of test names as second.
      */
+    jQuery.ajaxSettings.traditional = true;
     $.ajax({
         type: "POST",
         url: 'http://localhost:9090/Services/GetProjectsByName/',
@@ -208,7 +208,7 @@ function CountTestsForProject(name, callback) {
                 url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
                 data: {
                     plugin: project.results.plugin,
-                    path: project.results.paths
+                    path: project.results.files
                 },
                 success: function(data) {
                     $('#badge' + name).html(data.results.length);
@@ -225,7 +225,6 @@ function CountTestsForProject(name, callback) {
 
 function AppendTestSuite(testsuitename) {
     if ($('#' + testsuitename).length == 0) {
-    
         $('#TestSuiteListing')
             .append($("<div>").addClass("panel panel-default testsuite").attr("id", testsuitename)
                 .append($("<div>").addClass("panel-heading")
