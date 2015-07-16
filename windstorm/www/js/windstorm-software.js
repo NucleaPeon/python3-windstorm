@@ -161,6 +161,7 @@ function GenFileBlock(data) {
     var filename = null;
     for (d in data) {
         if ((data[d] != "") && (data[d] !== undefined)) {
+            $('#list_projectfiles').empty();
             $('#list_projectfiles')
                 .append($("<div>").addClass("input-group projectfilepath").attr("id", "filename" + d)
                     .append($("<span>").addClass("input-group-addon glyphicon glyphicon-file"))
