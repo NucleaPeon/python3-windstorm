@@ -393,7 +393,9 @@ class Services(daemon.Daemon):
     
     
     def RunTest(self, test=None, **kwargs):
-        return None
+        import time
+        time.sleep(0.3)
+        return True
     
     def CountTestModulesInFile(self, test=None, **kwargs):
         return 1

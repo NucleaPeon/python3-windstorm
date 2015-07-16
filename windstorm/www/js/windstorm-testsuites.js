@@ -113,11 +113,13 @@ function DeleteTestSuites() {
 }
 
 function SaveTestSuite(testsuitename) {
-    $.post('http://localhost:9090/Services/SaveTestSuite/',
-           {suite: testsuitename},
-           function(data) {
-               GetTestSuites();
-           });
+    if ($('#tsname').val() != "") {
+        $.post('http://localhost:9090/Services/SaveTestSuite/',
+            {suite: testsuitename},
+            function(data) {
+                GetTestSuites();
+            });
+    }
 }
 
 function Upload(testsuitename) {
@@ -432,6 +434,10 @@ function StartRunTests(completecallback) {
     $('#testprogress').empty();
     $('#run').attr({"disabled": "disabled"});
     var testsuitename = $('#runtesttitle').html();
+    var oncomplete = function() {
+        console.log("Testing complete");
+    }
+    
     if ((testsuitename !== undefined) && (testsuitename != "")) {
         $('#testprogress')
             .append($("<hr>"))
@@ -446,40 +452,51 @@ function StartRunTests(completecallback) {
                 .append($("<div>").addClass("progress-bar").attr({
                     "role": "progressbar", "aria-valuenow": "0", "aria-valuemin": "2",
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
-                }).css("color", "black"))
+                }).css("color", "white"))
              );
             
         // Define async callback methods for "synchronous-like" functionality loops
-        var runtest = function(tests, totaltests, callback) {
-            
+        var runtest = function(tests, totaltests, callback, success) {
             if (tests.length <= 0) {
                 $('#run_overall').css("width",  "100%");
                 $("#run").removeAttr("disabled");
                 $('#runtestsauto' + testsuitename).removeAttr("disabled")
-                if (completecallback !== undefined) {
-                    completecallback();
+                console.log("Preparing to call success()");
+                if (success !== undefined) {
+                    console.log("Calling success callback");
+                    success();
                 }
-                return;
+                else {
+                    return;
+                }
             }
-            
-            /**
-             * tests: list of filename/paths to test modules
-             * totaltests: length of every test module being run (does not change)
-             * callback: function to call once one test module has run
-             */
-            $.post("http://localhost:9090/Services/RunTest/",
-                {test: tests[0]},
-                function(data) {
-                    $('#run_overall').attr("aria-valuenow", 1);
-                    
-                },
-                "json"
-            ).done(function(data) {
-                $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
-                // Recall this method but with the first element chopped. This means
-                // our width will increase based on its equation until it reaches 100.
-                callback(tests.slice(1), totaltests, callback);
-            });
+            else {
+                $('#run_single').attr("aria-valuenow", 50);
+                $('#run_single').css("width",  "50%");
+                /**
+                * tests: list of filename/paths to test modules
+                * totaltests: length of every test module being run (does not change)
+                * callback: function to call once one test module has run
+                */
+                $.post("http://localhost:9090/Services/RunTest/",
+                    {test: tests[0]},
+                    function(data) {
+                        $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
+                        $('#run_overall').css("width",  ((Number($('#run_overall').attr("aria-valuenow"))/Number($('#run_overall').attr("aria-valuemax"))) * 100) + "%");
+                        $('#run_overall').html(tests[0]);
+                        $('#run_single').attr("aria-valuenow",  0);
+                        $('#run_single').css("width",  "0%");
+                    },
+                    "json"
+                ).done(function(data) {
+                    console.log("Finished running test");
+                    // Recall this method but with the first element chopped. This means
+                    // our width will increase based on its equation until it reaches 100.
+                    $('#run_single').attr("aria-valuenow",  100);
+                    $('#run_single').css("width",  "100%");
+                    callback(tests.slice(1), totaltests, callback, success);
+                });
+            }
         };
         
         // Start running tests
@@ -488,21 +505,31 @@ function StartRunTests(completecallback) {
             function(testdata) {
                 // Calculate total tests
                 var total = 0;
-                for(var group in testdata.results) {
-                    for(var suite in testdata.results[group]) {
-                        for(var project in testdata.results[group][suite]) {
-                            total += testdata.results[group][suite][project].length;
-                        }
+                for(var suite in testdata.results) {
+                    for(var project in testdata.results[suite]) {
+                        total += testdata.results[suite][project].length;
                     }
                 }
-                for(var group in testdata.results) {
-                    for(var suite in testdata.results[group]) {
-                        for(var project in testdata.results[group][suite]) {
-                            runtest(testdata.results[group][suite][project], 
-                                    total, runtest);
-                        }
+                $('#run_overall').css("width", "0%");
+                $('#run_overall').attr("aria-valuemax", total);
+                // PROBLEM AREA: Loops are spamming runtest requests. It should start
+                // as one request which leads into others.
+                
+                var run_project_tests = function(tests, success) {
+                    console.log("run projects");
+                    for(var t in tests) {
+                        runtest(tests[t], t.length, runtest, oncomplete);
+                    }
+                };
+                
+                var run_suites = function(suites, success) {
+                    console.log("run_suites");
+                    for(var s in suites) {
+                        run_project_tests(suites[s]);
                     }
                 }
+                console.log("Starting to run tests from GetSuiteTestFilenames");
+                run_suites(testdata.results);
             },
             "json"
         );
