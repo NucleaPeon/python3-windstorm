@@ -24,6 +24,7 @@ import re
 import os
 
 def find(path):
+    # If a single path is given as a string, ensure it's a list then continue
     if not isinstance(path, list):
         path = [path]
 

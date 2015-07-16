@@ -203,6 +203,9 @@ function CountTestsForProject(name, callback) {
         url: 'http://localhost:9090/Services/GetProjectsByName/',
         data: {name: name},
         success: function(project) {
+            console.log("Before LoadTestsByPlugin Check");
+            console.log(project.results.plugin);
+            console.log(project.results.files);
             $.ajax({
                 type: "POST",
                 url: 'http://localhost:9090/Services/LoadTestsByPlugin/',

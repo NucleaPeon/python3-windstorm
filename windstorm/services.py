@@ -269,9 +269,7 @@ class Services(daemon.Daemon):
         if not plugin is None:
             plugin = plugin[0].decode('utf-8')
             
-        logging.info(path)
         loadedtests = []
-        
         if path is None:
             logging.warning("No path supplied")
             return loadedtests
@@ -281,12 +279,15 @@ class Services(daemon.Daemon):
             return loadedtests # empty
         
         try:
+            logging.info(path)
+            path = list(map(lambda x: x.decode("utf-8"), path)) if not path is None else []
             mod = importlib.import_module(plugin)
             loadedtests = mod.find(path)
             logging.info(loadedtests)
             
-        except:
+        except Exception as E:
             logging.error("Module failed to import, plugin {}".format(plugin))
+            return {"error": str(E)}
         
         return loadedtests
     
