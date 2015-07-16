@@ -24,16 +24,16 @@ import re
 import os
 
 def find(path):
-    # use SOMETHING for now
-    if isinstance(path, list):
-        # run on multiple paths and extend 
-        return ["/home/user/TestExampleFound1.py",
-                "/home/user/TestExampleFound2.py",
-                "/home/user/TestExampleFound3.py",
-                "/home/user/TestExampleFound4.py"]
-    
-    else:
-        return ["/home/user/TestExampleFound1.py",
-                "/home/user/TestExampleFound2.py",
-                "/home/user/TestExampleFound3.py",
-                "/home/user/TestExampleFound4.py"]
+    if not isinstance(path, list):
+        path = [path]
+
+    tests = []
+    _filter = []
+    prog = re.compile(r"(^Test[\w]+.py$)")
+    for p in path:
+        for root, _dir, _files in os.walk(p):
+            _filter = list(filter(lambda x: not prog.match(x) is None, _files))
+            if _filter:
+                tests.extend(_filter)
+        
+    return tests
