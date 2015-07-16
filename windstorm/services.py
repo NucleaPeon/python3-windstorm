@@ -306,8 +306,8 @@ class Services(daemon.Daemon):
         # Returns {project: [], additional: {}}
         if not suite is None:
             suite = suite[0].decode('utf-8')
-            logging.info("Finding Test Suite {}".format(suite))
             if suite in self.testsuites:
+                logging.info(self.testsuites[suite])
                 return self.testsuites[suite]
             
         return {}
@@ -328,7 +328,9 @@ class Services(daemon.Daemon):
             return None
         
         suite = suite[0].decode("utf-8")
+        logging.info("Suite is {}".format(suite))
         projects = list(map(lambda x: x.decode("utf-8"), projects))
+        logging.info("Projects for suite are {}".format(projects))
         self.testsuites[suite]["projects"] = projects
     
     def GetGroupTestFilenames(self, group=None, **kwargs):
