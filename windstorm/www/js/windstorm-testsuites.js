@@ -139,7 +139,7 @@ function GetProjects() {
                    var name = data.results[i].title;
                    if ($('#projdata' + name).length == 0) {
                         $("#projectlisting")
-                            .append($("<div>").attr("id", "projdata" + name).addClass("projectdata col-md-12")
+                            .append($("<div>").attr("id", "projdata" + name).addClass("projectdata")
                                 .append($("<div>").addClass("input-group")
                                     .append($("<span>").addClass("input-group-addon")
                                         .append($("<input>").addClass("checkbox").attr({

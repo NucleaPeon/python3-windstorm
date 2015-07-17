@@ -7,21 +7,22 @@ based on a filename regular expression and return the full path
 to the tests.
 
     Example:
-    
+
     /project/
              myprojectfile1.py
              myprojectfile2.py
              TestMyProjectFiles.py
-             
+
     Test plugin will default to look for files that start with "Test" and
     end with ".py" (regex something like ^(Test[*.]\.py)$ ) and return
     the joined root and filename if this is a match.
-    
+
     Return value must be a list.
 """
 
 import re
 import os
+import logging
 
 def find(path):
     # If a single path is given as a string, ensure it's a list then continue
@@ -32,9 +33,16 @@ def find(path):
     _filter = []
     prog = re.compile(r"(^Test[\w]+.py$)")
     for p in path:
-        for root, _dir, _files in os.walk(p):
-            _filter = list(filter(lambda x: not prog.match(x) is None, _files))
-            if _filter:
-                tests.extend(_filter)
-        
+        # Capture individual files or walk through directories to get tests
+        if os.path.isfile(p):
+            logging.info("File is {}".format(p.split(os.sep)[-1]))
+            if prog.match(p.split(os.sep)[-1]):
+                tests.insert(0, p)
+
+        else:
+            for root, _dir, _files in os.walk(p):
+                _filter = list(filter(lambda x: not prog.match(x) is None, _files))
+                if _filter:
+                    tests.extend(_filter)
+
     return tests
