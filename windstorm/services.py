@@ -162,25 +162,18 @@ class Services(daemon.Daemon):
             else:
                 self.testgroups[group] = [suite]
     
-    def DeleteTestSuites(self, suites=None, group=None, **kwargs):
+    def DeleteTestSuites(self, suites=None, **kwargs):
         deltests = []
-        if not group is None:
-            group = group[0].decode('utf-8')
-            
         for s in suites:
             s = s.decode('utf-8')
-            if not s in self.testgroups[group]:
-                logging.info("{} not in test groups".format(s))
-                continue
-                
-            else:
-                if s in self.testgroups[group]:
-                    self.testgroups[group] = list(filter(lambda x: x != s, self.testgroups[group]))
-                    logging.info("{} found in groups and removed".format(s))
-                    if s in self.testsuites:
-                        del self.testsuites[s]
-
-                    deltests.append(s)
+            if s in self.testsuites:
+                del self.testsuites[s]
+                deltests.append(s)
+                for g in self.testgroups.keys():
+                    logging.info("Checking if suite is in any groups")
+                    if s in self.testgroups[g]:
+                        logging.info("Suite {} found in Group {}".format(s, g))
+                        self.testgroups[g] = list(set(filter(lambda x: x != s, self.testgroups[g])))
             
         return dict(deleted=deltests)
     

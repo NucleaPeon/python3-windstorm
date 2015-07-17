@@ -100,8 +100,7 @@ function DeleteTestSuites() {
     if (suitelbls.length > 0) {
         jQuery.ajaxSettings.traditional = true;
         $.post('http://localhost:9090/Services/DeleteTestSuites/',
-           {"suites": suitelbls,
-            "group": "TestTestGroup"},
+           {"suites": suitelbls},
            function(data) {
                console.log("TODO");
                console.log(data);
