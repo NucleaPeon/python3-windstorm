@@ -385,37 +385,58 @@ class Services(daemon.Daemon):
 
         return tests
 
+    def _prepare_tests(self, filename, pythonpath=None):
+        """
+        :Description:
+            Takes the filename and optional pythonpath (if it's none, we
+            add the directory minus filename) to produce the test module and
+            the count of tests in said module as a tuple.
+
+            Module is used for runtests, count is used for CountTestModulesInFile.
+
+        :Returns:
+            - tuple (module, count,)
+        """
+        splitpath = filename.split(os.sep)
+        if pythonpath is None:
+            sys.path.insert(0, os.path.join(os.sep, *splitpath[:-1]))
+
+        else:
+            if os.path.exists(os.path.join(pythonpath)):
+                sys.path.insert(0, pythonpath)
+
+        tloader = unittest.TestLoader()
+        mod = importlib.import_module(splitpath[-1].rstrip(".py"))
+        loadedtests = tloader.loadTestsFromModule(mod)
+        return (mod, loadedtests.countTestCases(),)
 
     def RunTest(self, test=None, pythonpath=None, **kwargs):
         if test is None:
             return None
 
-        if not pythonpath is None:
-            pythonpath = pythonpath[0].decode("utf-8")
-            if os.path.exists(pythonpath):
-                sys.path.insert(0, pythonpath)
-
-            else:
-                logging.warning("Python path {} is not a valid path".format(pythonpath))
-
         test = test[0].decode("utf-8")
-        logging.info("\t" + test)
+        mod, count = self._prepare_tests(test, pythonpath)
         tloader = unittest.TestLoader()
-        splitpath = test.split(os.sep)
-        logging.info(splitpath)
-        if pythonpath is None:
-            sys.path.insert(0, os.path.join(os.sep, *splitpath[:-1]))
-            logging.info(sys.path)
-
-        # FIXME: Create a Run Plugin module
-        mod = importlib.import_module(splitpath[-1].rstrip(".py"))
         loadedtests = tloader.loadTestsFromModule(mod)
-        logging.info("Loaded tests {}".format(loadedtests))
+        retval = {}
+        # FIXME: Create a Run Plugin module
+        for lt in loadedtests:
+            retval['count'] = count
+            for t in lt:
+                tresults = t.run()
+                retval['tests'] = {t.id(): {"errors": tresults.errors,
+                                            "failures": tresults.failures,
+                                            "skipped": tresults.skipped,
+                                            "ran": tresults.testsRun}}
 
-        return True
+        return retval
 
     def CountTestModulesInFile(self, test=None, **kwargs):
-        return 1
+        if tests is None:
+            return -1
+
+        mod, count = self._prepare_tests(test)
+        return count
 
 
 def start(pidfile, in_dir="/"):
