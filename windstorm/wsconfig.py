@@ -11,6 +11,7 @@ import logging
 PROJECT_DIR = "projects.d"
 SUITE_DIR = "suites.d"
 GROUPS_DIR = "groups.d"
+DB_FILE = "testdb"
 
 def write_projects(directory, projects):
     """
@@ -24,16 +25,25 @@ def write_projects(directory, projects):
         if not os.path.exists(checkdir):
             try:
                 logging.info("Creating {} Directory".format(PROJECT_DIR))
-                os.makedirs(checkdir)
+                os.makedirs(checkdir, exist_ok=True)
 
             except PermissionError as pE:
                 logging.error(str(pE))
                 return False
 
-
         cp = configparser.ConfigParser()
         if checkdir:
-            cp.read(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p)))
+            cp.read(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])))
+
+        # request writing file database if option is set
+        logging.info("Sections in config parser file: {}".format(cp.sections()))
+        if 'tests' in cp.sections():
+            if 'persist' in cp['tests']:
+                if cp['tests']['persist']:
+                    logging.info("Writing to db")
+                    write_tests_to_db(directory, p['title'],
+                                      p['files'])
+
 
         cp['project'] = {'plugin': p['plugin']}
         cp['depfiles'] = {y.split(os.sep)[-1]: y for y in p['depends']['files']} if not p['depends'].get('files') is None else {}
@@ -58,20 +68,27 @@ def read_projects(directory, projects=[]):
     """
     retval = {}
     cp = None
-    for p in os.listdir(os.path.join(directory, PROJECT_DIR)):
-        cp = configparser.ConfigParser()
-        cp.read(os.path.join(directory, PROJECT_DIR, p))
-        p = p.replace(".conf", "")
-        project = {}
-        project['title'] = p
-        project['depends'] = {'files': None,
-                              'windstorminstances': None,
-                              'services': None}
+    logging.info(directory)
+    logging.info(projects)
+    if len(projects) > 0:
+        pass
 
-        project['files'] = []
-        project['size'] = 0
-        project['plugin'] = cp['project']['plugin']
-        retval[p] = project
+    else:
+        for p in os.listdir(os.path.join(directory, PROJECT_DIR)):
+            cp = configparser.ConfigParser()
+            logging.info(os.path.join(directory, PROJECT_DIR, p))
+            cp.read(os.path.join(directory, PROJECT_DIR, p))
+            p = p.replace(".conf", "")
+            project = {}
+            project['title'] = p
+            project['depends'] = {'files': None,
+                                'windstorminstances': None,
+                                'services': None}
+
+            project['files'] = read_tests_from_db(directory, p)
+            project['size'] = 0
+            project['plugin'] = cp['project']['plugin']
+            retval[p] = project
 
     return retval
 
@@ -83,3 +100,31 @@ def write_group(group, directory):
 
 def read_suite(suite, directory):
     pass
+
+def write_tests_to_db(directory, projtitle, files):
+    if not os.path.exists(os.path.join(directory, DB_FILE)):
+        os.makedirs(os.path.join(directory), exist_ok=True)
+
+    try:
+        with shelve.open(os.path.join(directory, DB_FILE)) as db:
+            db[projtitle] = files
+
+        return True
+
+    except PermissionError as pE:
+        logging.error(str(pE))
+
+    return False
+
+def read_tests_from_db(directory, projtitle):
+    if not os.path.exists(os.path.join(directory, DB_FILE)):
+        return [] # FIX THIS BLOCK SO ITs NOT REDUNDANT
+
+    try:
+        with shelve.open(os.path.join(directory, DB_FILE)) as db:
+            return db[projtitle]
+
+    except PermissionError as pE:
+        logging.error(str(pE))
+
+    return []
