@@ -162,6 +162,10 @@ class Services(daemon.Daemon):
     def __persist_suites_and_groups(self, in_dir, suites=None, groups=None):
         logging.info("__persist_suites_and_groups")
 
+    def __remove_projects(self, in_dir, projects=None):
+        logging.info("FIXME")
+        return True
+
     def run(self):
         server = HTTPServer(self.application)
         server.listen(9091, address='localhost')
@@ -263,13 +267,17 @@ class Services(daemon.Daemon):
         retval = False
         if title in self.projects:
             logging.info("Found project {} to delete".format(title))
-            del self.projects[title]
+            # Remove config file and then delete from cache
+            if self.__remove_projects(self.__directory__, projects=[self.projects[title]]):
+                del self.projects[title]
+
             retval = True
 
         return dict(deleted=json.dumps(retval))
 
     def UpdateProject(self, project=None, files=None,
                       description=None, **kwargs):
+        logging.info("\tfiles: {}".format(files))
         if project is None:
             return project
 
@@ -316,10 +324,7 @@ class Services(daemon.Daemon):
         self.projects[project]["files"] = files
         self.projects[project]["description"] = description
         self.projects[project]["size"] = int(Decimal(size/Decimal(1000000)).quantize(Decimal('1.'), rounding=ROUND_UP))
-
         written = self.__persist_projects(self.__directory__, projects=self.projects[project])
-        logging.info("Project written: {}".format(written))
-
         return self.projects[project]
 
     def LoadTestsByPlugin(self, plugin=None, path=None, **kwargs):
@@ -442,7 +447,7 @@ class Services(daemon.Daemon):
                 for p in projects:
                     for pth in self.projects[p]['files']:
                         tests[suite][p] = self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
-                                                            path=[bytes(pth, "utf-8")])
+                                                                 path=[bytes(pth, "utf-8")])
 
             if self.testsuites[suite]["additional"]:
                 logging.warning("TODO: Additional files not implemented")
@@ -463,6 +468,9 @@ class Services(daemon.Daemon):
         """
         splitpath = filename.split(os.sep)
         if pythonpath is None:
+            logging.info("Preparing with path insert to {}".format(os.path.join(os.sep, *splitpath[:-1])))
+            logging.info(filename)
+            logging.info(splitpath)
             sys.path.insert(0, os.path.join(os.sep, *splitpath[:-1]))
 
         else:
@@ -478,6 +486,7 @@ class Services(daemon.Daemon):
         if test is None:
             return None
 
+        logging.info("\tRunning Test {}".format(test))
         test = test[0].decode("utf-8")
         mod, count = self._prepare_tests(test, pythonpath)
         tloader = unittest.TestLoader()

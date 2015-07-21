@@ -20,22 +20,32 @@ def write_projects(directory, projects):
     """
     cp = None
     for p in projects:
-        cp = configparser.ConfigParser()
-        cp.read(os.path.join(directory, PROJECT_DIR, p + ".conf"))
-        cp['project'] = {'plugin': p['plugin']}
-        cp['depfiles'] = {y.split(os.sep)[-1]: y for y in p['depends']['files']}
-        cp['windstorminstances'] = {}
-
-
         checkdir = os.path.join(directory, PROJECT_DIR)
         if not os.path.exists(checkdir):
             try:
+                logging.info("Creating {} Directory".format(PROJECT_DIR))
                 os.makedirs(checkdir)
-                with open(os.path.join(directory, PROJECT_DIR, p['title'] + ".conf"), 'w') as cpwrite:
-                    cp.write(cpwrite)
 
             except PermissionError as pE:
+                logging.error(str(pE))
                 return False
+
+
+        cp = configparser.ConfigParser()
+        if checkdir:
+            cp.read(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p)))
+
+        cp['project'] = {'plugin': p['plugin']}
+        cp['depfiles'] = {y.split(os.sep)[-1]: y for y in p['depends']['files']} if not p['depends'].get('files') is None else {}
+        cp['windstorminstances'] = {}
+        cp['tests'] = {'shelve-filename': "{}.db".format(p['title']),
+                       'autoupdate-on-run': True,
+                       'persist': True}
+
+        with open(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])), 'w') as cpwrite:
+            cp.write(cpwrite)
+            logging.info("Wrote configuration file of project {}".format(p))
+
 
     return True
 

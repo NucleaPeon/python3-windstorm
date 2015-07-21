@@ -17,7 +17,7 @@ to the tests.
     end with ".py" (regex something like ^(Test[*.]\.py)$ ) and return
     the joined root and filename if this is a match.
 
-    Return value must be a list.
+    Return value must be a list of tuples (path-leading-to-test-file, filename,)
 """
 
 import re
@@ -43,6 +43,6 @@ def find(path):
             for root, _dir, _files in os.walk(p):
                 _filter = list(filter(lambda x: not prog.match(x) is None, _files))
                 if _filter:
-                    tests.extend(_filter)
+                    tests.extend([(root, f,) for f in _filter])
 
     return tests

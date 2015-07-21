@@ -169,7 +169,7 @@ function GetProjects() {
                                                         )
                                                     );
                                                 var refid = '#' + $(this).attr("refid");
-                                                CountTestsForProject(name, function() {
+                                                CountTestsForProject(name, function(num, list) {
                                                     $(refid).empty();
                                                 });
 
