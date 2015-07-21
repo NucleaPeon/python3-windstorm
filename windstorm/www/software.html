@@ -44,7 +44,7 @@
                             <textarea class="form-control" rows="2" id="projectdescription" placeholder="Description"></textarea>
                         </div>
                     </div>
-                </div>    
+                </div>
             </div>
             <div class="modal-body row">
                 <div class="col-md-6">
@@ -65,7 +65,7 @@
                 <div class="col-md-12">
                     <div class="input-group col-md-12">
                         <span class="input-group-addon glyphicon glyphicon-folder-open"></span>
-                        <input type="text" class="form-control " onclick="alert('Add files');" placeholder="Add Project Files/Folders" 
+                        <input type="text" class="form-control " onclick="alert('Add files');" placeholder="Add Project Files/Folders"
                                ondrop="ProjectUploadFolder(event);" id="projectuploadfolder"/>
                     </div>
                     <br />
@@ -95,12 +95,12 @@
                             <div class="accordion-heading">
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
                                 Service Dependencies
-                            </a> - 
+                            </a> -
                             <a href="#">[+] Add Dependency</a>
                             </div>
                             <div id="collapseOne" class="accordion-body collapse in">
                             <div class="accordion-inner">
-                                
+
                             </div>
                             </div>
                         </div>
@@ -108,12 +108,12 @@
                             <div class="accordion-heading">
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
                                 File Dependencies
-                            </a> - 
+                            </a> -
                             <a href="#">[+] Add Dependency</a>
                             </div>
                             <div id="collapseTwo" class="accordion-body collapse">
                             <div class="accordion-inner">
-                                
+
                             </div>
                             </div>
                         </div>
@@ -121,12 +121,12 @@
                             <div class="accordion-heading">
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
                                 Windstorm Instances
-                            </a> - 
+                            </a> -
                             <a href="#">[+] Add Dependency</a>
                             </div>
                             <div id="collapseThree" class="accordion-body collapse">
                             <div class="accordion-inner">
-                            
+
                             </div>
                             </div>
                         </div>
@@ -157,13 +157,10 @@
             <span class="input-group-addon" id="project_title">Title</span>
             <input id="mpname" type="text" class="form-control" placeholder="Project Name" aria-describedby="project_username"><br />
         </div>
-        
-        <!--  # Ignore top level directory location for project files for now
-        
-        -->
+        <!--  # Ignore top level directory location for project files for now -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" id="SaveSoftwareBtn"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="CreateSoftwareBtn"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
       </div>
     </div>
@@ -191,6 +188,6 @@ $(document).ready( function() {
         console.log(label);
     });
     GetProjects();
-    
+
 });
 {% end %}

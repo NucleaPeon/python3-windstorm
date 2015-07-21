@@ -3,7 +3,7 @@ $(document).on("ready", function() {
         $('#tsname').focus();
         var func = $(document).keypress(function(e) {
             if(e.which == 13) {
-                $('#SaveTestSuite').click();
+                $('#CreateTestSuite').click();
                 $('#AddTestSuite').modal("hide");
                 return false;
             }
@@ -12,28 +12,28 @@ $(document).on("ready", function() {
     $("#ProjectSelect").on("shown.bs.modal", function() {
         GetProjects();
         $('#projectloadergif').addClass("hidden");
-        
+
     });
     $("#ProjectSelect").on("hidden.bs.modal", function() {
         $('.progressbar').empty()
         $('#accept_ts_btn').off("click");
     });
-    
+
     $("#AddTestSuite").on("hidden.bs.modal", function() {
         $(document).off("keypress");
         $("#tsname").val("");
     });
-    
+
     $("#RunTestModal").on("shown.bs.modal", function() {
         $('#run').on("click", function() {
             StartRunTests();
         });
     });
-    
+
     $("#RunTestModal").on("hidden.bs.modal", function() {
         $('#run').off("click");
     });
-    
+
 });
 
 function GetTestSuites(callback) {
@@ -93,7 +93,7 @@ function AddTestSuite() {
 function DeleteTestSuites() {
     var suites = $('.testsuite-active');
     var suitelbls = []
-    
+
     for (var i=0; i < suites.length; i++)  {
         suitelbls.push(suites[i].id);
     }
@@ -111,9 +111,9 @@ function DeleteTestSuites() {
     }
 }
 
-function SaveTestSuite(testsuitename) {
+function CreateTestSuite(testsuitename) {
     if ($('#tsname').val() != "") {
-        $.post('http://localhost:9090/Services/SaveTestSuite/',
+        $.post('http://localhost:9090/Services/CreateTestSuite/',
             {suite: testsuitename},
             function(data) {
                 GetTestSuites();
@@ -172,7 +172,7 @@ function GetProjects() {
                                                 CountTestsForProject(name, function() {
                                                     $(refid).empty();
                                                 });
-                                                
+
                                             }
                                         })
                                     )
@@ -192,7 +192,7 @@ function CountTestsForProject(name, callback) {
     /**
      * Function that updates modal window test counts for a project
      * based on name.
-     * 
+     *
      * Callback argument is optional; if supplied, it will call
      * the method with the number of tests it found as the first parameter
      * and list of test names as second.
@@ -315,15 +315,15 @@ function UpdateProjectTests(testsuitename, successcb) {
     /**
      * Invoked when the user clicks "accept" button in modal window
      * for adding in project and additional tests into the suite.
-     * 
+     *
      * Updates project information from the modal window, specifically
      * the checked projects and any additional tests dragged into the
      * drop element.
-     * 
-     * If a project is selected for inclusion of its tests into the 
+     *
+     * If a project is selected for inclusion of its tests into the
      * suite, it will count the tests for the project and add them
      * into badges (refreshes all tests) and hides modal window.
-     * 
+     *
      * Requests a refreshed test view on the main testsuite web page
      * in the suite's accordion elements.
      */
@@ -331,13 +331,13 @@ function UpdateProjectTests(testsuitename, successcb) {
     var testsFromProjects = 0;
     var projid = null;
     var checked = [];
-    
+
     var checkprojects = function(current_checked, callback) {
         if ($(".projectdata .checkbox:checked").length >= current_checked) {
             callback();
         }
     }
-    
+
     var success = function(checked, testsuitename) {
         $.post("http://localhost:9090/Services/UpdateTestSuite/",
             {projects: checked,
@@ -349,7 +349,7 @@ function UpdateProjectTests(testsuitename, successcb) {
             RefreshTestViewInSuite(testsuitename);
         });
     }
-    
+
     var updateproject = function(project) {
         checked.push(project.attr("proj"));
         CountTestsForProject(project.attr("id"), function(testCount, tests) {
@@ -358,21 +358,21 @@ function UpdateProjectTests(testsuitename, successcb) {
             $('#badge' + testsuitename).html(testsFromProjects);
             $('#ProjectSelect').modal("hide");
             $('#tests' + testsuitename).append("Test");
-            checkprojects(checked.length, function() { 
+            checkprojects(checked.length, function() {
                 if (successcb === undefined) {
-                    success(checked, testsuitename);    
+                    success(checked, testsuitename);
                 } else {
                     successcb(checked, testsuitename)
                 }
             });
         });
     }
-    
+
     var checkeditems = $(".projectdata .checkbox:checked")
     for(var i=0; i < checkeditems.length; i++) {
         updateproject($(checkeditems[i]));
     }
-    
+
 
 }
 
@@ -399,7 +399,7 @@ function RefreshTestViewInSuite(testsuitename) {
                             .append($("<div>").addClass("panel-heading")
                                 .append($("<h3>").addClass("panel-title").html(data.results.projects[i]))
                                 .on("click", function() {
-                                    
+
                                     $('#collapse' + testsuitename + data.results.projects[i]).collapse('toggle');
                                 })
                             )
@@ -436,7 +436,7 @@ function StartRunTests(completecallback) {
     var oncomplete = function() {
         console.log("Testing complete");
     }
-    
+
     if ((testsuitename !== undefined) && (testsuitename != "")) {
         $('#testprogress')
             .append($("<hr>"))
@@ -453,7 +453,7 @@ function StartRunTests(completecallback) {
                     "aria-valuemax": "100", "style": "width: 0%;", "id": "run_overall"
                 }).css("color", "white"))
              );
-            
+
         // Define async callback methods for "synchronous-like" functionality loops
         var runtest = function(tests, totaltests, callback, success) {
             if (tests.length <= 0) {
@@ -497,7 +497,7 @@ function StartRunTests(completecallback) {
                 });
             }
         };
-        
+
         // Start running tests
         $.post("http://localhost:9090/Services/GetSuiteTestFilenames/",
             {suite: testsuitename}, /** FIXME: Hardcode for now **/
@@ -513,14 +513,14 @@ function StartRunTests(completecallback) {
                 $('#run_overall').attr("aria-valuemax", total);
                 // PROBLEM AREA: Loops are spamming runtest requests. It should start
                 // as one request which leads into others.
-                
+
                 var run_project_tests = function(tests, success) {
                     console.log("run projects");
                     for(var t in tests) {
                         runtest(tests[t], t.length, runtest, oncomplete);
                     }
                 };
-                
+
                 var run_suites = function(suites, success) {
                     console.log("run_suites");
                     for(var s in suites) {

@@ -11,6 +11,7 @@ import json
 import inspect
 import importlib
 from decimal import *
+import wsconfig
 try:
     import tornado
     import tornado.web
@@ -39,6 +40,28 @@ RESULT_STATUS = {
 }
 
 class Services(daemon.Daemon):
+    """
+    A note on Configuration and Persistence:
+
+    Configurations are saved in a directory relative to the windstorm project,
+    see the in_dir variable in the __main__ method of this module.
+
+    As this class should not be initialied in, say, the filesystem root,
+    it is unlikely that the default value of / will ever be used.
+    By default, windstorm is run in the directory you call it from.
+    (When installed on the OS through package manager, a script might
+    have to call windstorm individually to prepare the folder.
+
+    Configurations and shelve database are saved in folders that
+    are created if they do not exist. (If user cannot write, command
+    fails but test suite is still usable, just not saveable. Export
+    config files option needs to be available)
+
+    Tests are updated every time a project is loaded, assuming
+    an option does not explicitly prevent reloading of tests,
+    just using the shelve database to ensure tests are not
+    changed (in case certain tests added or removed break the test).
+    """
 
     class Routes(tornado.web.RequestHandler):
 
@@ -56,11 +79,32 @@ class Services(daemon.Daemon):
             self.write({"results": None})
 
 
-    def __init__(self, pidfile):
+    def __load_projects(self, in_dir):
+        """ Load using configparser sans tests, save those via shelve."""
+        logging.info("__load_projects")
+
+    def __load_suites_and_groups(self, in_dir):
+        """ Load using configparser. """
+        logging.info("__load_suites_and_groups")
+
+    def __persist_projects(self, in_dir, projects=None):
+        if not isinstance(projects, list):
+             projects = [projects]
+
+        return wsconfig.write_project(projects, self.__directory__)
+
+    def __persist_suites_and_groups(self, in_dir, suites=None, groups=None):
+        logging.info("__persist_suites_and_groups")
+
+    def __init__(self, pidfile, in_dir):
         super().__init__(self)
+        self.__directory__ = in_dir
         self.pidfile = pidfile
         # Add plugins directory
         sys.path.insert(0, os.path.join(os.getcwd(), "plugins.d"))
+        self.__load_projects(in_dir)
+        self.__load_suites_and_groups(in_dir)
+
         # Information Cache:
         """
         self.projects = {
@@ -131,7 +175,7 @@ class Services(daemon.Daemon):
         if not name is None:
             name = name[0].decode('utf-8')
             if not self.projects.get(name) is None:
-                return self.projects[name]["paths"]
+                return self.projects[name]["files"]
 
         return []
 
@@ -146,7 +190,7 @@ class Services(daemon.Daemon):
     def GetTestSuites(self, **kwargs):
         return self.testsuites
 
-    def SaveTestSuite(self, suite=None, group=None, **kwargs):
+    def CreateTestSuite(self, suite=None, group=None, **kwargs):
         if not suite is None:
             suite = suite[0].decode("utf-8")
 
@@ -179,6 +223,12 @@ class Services(daemon.Daemon):
         return dict(deleted=deltests)
 
     def SaveProject(self, title=None, **kwargs):
+        logging.info("SaveProject")
+
+    def SaveTestSuite(self, suite=None, group=None, **kwargs):
+        logging.info("SaveTestSuite")
+
+    def CreateProject(self, title=None, **kwargs):
         if not title is None:
             title = title[0].decode('utf-8')
 
@@ -236,6 +286,7 @@ class Services(daemon.Daemon):
             return size
 
         project = project[0].decode("utf-8")
+        logging.info("Project is {} before Update".format(project))
         if not project in self.projects:
             self.SaveProject(title=[bytes(project, "utf-8")])
 
@@ -253,9 +304,14 @@ class Services(daemon.Daemon):
                 logging.warning("File {} not found, removing".format(f))
                 del f
 
+        #self.projects[project] = {}
+        logging.info(self.projects)
         self.projects[project]["files"] = files
         self.projects[project]["description"] = description
         self.projects[project]["size"] = int(Decimal(size/Decimal(1000000)).quantize(Decimal('1.'), rounding=ROUND_UP))
+
+        written = self.__persist_projects(self.__directory__, projects=self.projects[project])
+        logging.info("Project written: {}".format(written))
 
         return self.projects[project]
 
@@ -326,6 +382,7 @@ class Services(daemon.Daemon):
         projects = list(map(lambda x: x.decode("utf-8"), projects))
         logging.info("Projects for suite are {}".format(projects))
         self.testsuites[suite]["projects"] = projects
+        self.__persist_suites_and_groups(self.__directory__, suites=suite)
 
     def GetGroupTestFilenames(self, group=None, **kwargs):
         """
@@ -447,7 +504,7 @@ def start(pidfile, in_dir="/"):
         sys.exit(1)
 
     if pid == 0:
-        Services(pidfile).start(in_dir=in_dir)
+        Services(pidfile, in_dir).start(in_dir=in_dir)
 
 def stop(pidfile):
     pfile = open(pidfile, 'r')

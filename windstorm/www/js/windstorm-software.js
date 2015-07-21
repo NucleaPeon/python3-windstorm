@@ -1,24 +1,24 @@
 $(document).on("ready", function() {
     $("#AddNewSoftware").on("shown.bs.modal", function() {
-        $("#SaveSoftwareBtn").on("click", function() {
-             SaveProject();
+        $("#CreateSoftwareBtn").on("click", function() {
+             CreateProject();
              return false;
         });
         $('#mpname').focus();
         var func = $(document).keypress(function(e) {
             if(e.which == 13) {
-                $('#SaveSoftwareBtn').click();
+                $('#CreateSoftwareBtn').click();
                 $('#AddNewSoftware').modal("hide");
                 return false;
             }
         });
     });
-    
+
     $("#AddNewSoftware").on("hidden.bs.modal", function() {
         $(document).off("keypress");
         $("#mpname").val("");
         $('#list_projectfiles').empty();
-        $("#SaveSoftwareBtn").off("click");
+        $("#CreateSoftwareBtn").off("click");
     });
 });
 
@@ -26,7 +26,7 @@ function AddProject() {
     $("#AddNewSoftware").modal("show");
 }
 
-function SaveProject() {
+function CreateProject() {
     var val = $('#mpname').val();
     if ((val == "") || (val === undefined)) {
         // Highlight the field in red background by adding in required class
@@ -35,7 +35,7 @@ function SaveProject() {
     if ($("#" + val).length == 0) {
         // TODO: Validation of title
         var projname = $('#mpname').val().replace(" ", "_");
-        $.post('http://localhost:9090/Services/SaveProject/', 
+        $.post('http://localhost:9090/Services/CreateProject/',
             {title: projname},
             function(data) {
                 $('#mpname').val('');
@@ -110,14 +110,14 @@ function AppendProjectPanel(project) {
     // Check to ensure project doesn't already exist before appending it
     if ($('#' + project.title).length == 0) {
         $('#ProjectListingDiv').prepend($("<div>").addClass("panel panel-primary").attr("id", project.title)
-            .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + project.title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() { 
+            .append($("<div>").addClass("panel-heading").append($("<span>").html("<b>" + project.title + "</b> ")).append($("<span>").addClass("glyphicon glyphicon-remove").on("click", function() {
                 DeleteSoftware(project.title);
-            })).on("click", function() { 
+            })).on("click", function() {
                 return false; // Fix for issue where clicking on header invokes body onclick event
             }))
             .append($("<div>").addClass("panel-body").append(
-                GenerateSoftwareSummary(project.title, project.description, "Project").on("click", function() { 
-                    ProjectSettingsModal(project.title, function() { 
+                GenerateSoftwareSummary(project.title, project.description, "Project").on("click", function() {
+                    ProjectSettingsModal(project.title, function() {
                         GenFileBlock(project.files);
                         $('#SoftwareDetails').modal("show");
                     });
@@ -150,7 +150,7 @@ function ProjectSettingsModal(title, callback) {
            function(project) {
                $('#numberoffiles').val(project.results.files.length);
                $('#projectsize').val(project.results.size);
-               
+
            })
     // Get project details based on title
     // fill in files, size and # of files inputs
