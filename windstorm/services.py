@@ -79,22 +79,6 @@ class Services(daemon.Daemon):
             self.write({"results": None})
 
 
-    def __load_projects(self, in_dir):
-        """ Load using configparser sans tests, save those via shelve."""
-        logging.info("__load_projects")
-
-    def __load_suites_and_groups(self, in_dir):
-        """ Load using configparser. """
-        logging.info("__load_suites_and_groups")
-
-    def __persist_projects(self, in_dir, projects=None):
-        if not isinstance(projects, list):
-             projects = [projects]
-
-        return wsconfig.write_project(projects, self.__directory__)
-
-    def __persist_suites_and_groups(self, in_dir, suites=None, groups=None):
-        logging.info("__persist_suites_and_groups")
 
     def __init__(self, pidfile, in_dir):
         super().__init__(self)
@@ -102,8 +86,6 @@ class Services(daemon.Daemon):
         self.pidfile = pidfile
         # Add plugins directory
         sys.path.insert(0, os.path.join(os.getcwd(), "plugins.d"))
-        self.__load_projects(in_dir)
-        self.__load_suites_and_groups(in_dir)
 
         # Information Cache:
         """
@@ -151,9 +133,34 @@ class Services(daemon.Daemon):
         self.testgroups = {}
         self.testresults = {}
 
+        self.__load_projects(in_dir)
+        self.__load_suites_and_groups(in_dir)
+
         self.application = tornado.web.Application([
             (r"/(.*)/", self.Routes, {"service": self}),
         ])
+
+    def __load_projects(self, in_dir):
+        """ Load using configparser sans tests, save those via shelve."""
+        projects = wsconfig.read_projects(in_dir)
+        logging.info("{}: {}".format(__name__, projects))
+        for key in projects:
+            self.projects[key] = projects[key]
+
+        logging.info(self.projects)
+
+    def __load_suites_and_groups(self, in_dir):
+        """ Load using configparser. """
+        logging.info("__load_suites_and_groups")
+
+    def __persist_projects(self, in_dir, projects=None):
+        if not isinstance(projects, list):
+             projects = [projects]
+
+        return wsconfig.write_projects(self.__directory__, projects)
+
+    def __persist_suites_and_groups(self, in_dir, suites=None, groups=None):
+        logging.info("__persist_suites_and_groups")
 
     def run(self):
         server = HTTPServer(self.application)
