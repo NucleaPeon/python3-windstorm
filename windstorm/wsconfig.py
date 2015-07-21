@@ -49,13 +49,18 @@ def read_projects(directory, projects=[]):
     retval = {}
     cp = None
     for p in os.listdir(os.path.join(directory, PROJECT_DIR)):
-        p = p.replace(".conf", "")
         cp = configparser.ConfigParser()
+        cp.read(os.path.join(directory, PROJECT_DIR, p))
+        p = p.replace(".conf", "")
         project = {}
         project['title'] = p
         project['depends'] = {'files': None,
                               'windstorminstances': None,
                               'services': None}
+
+        project['files'] = []
+        project['size'] = 0
+        project['plugin'] = cp['project']['plugin']
         retval[p] = project
 
     return retval
