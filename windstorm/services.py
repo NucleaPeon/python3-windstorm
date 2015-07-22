@@ -485,13 +485,15 @@ class Services(daemon.Daemon):
         """
         logging.info("PYTHON PATH {}".format(pythonpath))
         splitpath = list(filter(None, filename.split(os.sep)))
-        if pythonpath is None or not pythonpath:
+
+        if not os.path.join(os.sep, *splitpath[:-1]) in sys.path:
             logging.info("Preparing with path insert to {}".format(os.path.join(os.sep, *splitpath[:-1])))
             sys.path.insert(0, os.path.join(os.sep, *splitpath[:-1]))
 
-        else:
+        if not pythonpath is None and pythonpath:
             if os.path.exists(os.path.join(pythonpath)):
-                sys.path.insert(0, pythonpath)
+                if not pythonpath in sys.path:
+                    sys.path.insert(0, pythonpath)
 
         tloader = unittest.TestLoader()
         try:
@@ -535,9 +537,9 @@ class Services(daemon.Daemon):
                 retval['count'] = count
                 for t in lt:
                     tresults = t.run()
-                    retval['tests'] = {t.id(): {"errors": tresults.errors,
-                                                "failures": tresults.failures,
-                                                "skipped": tresults.skipped,
+                    retval['tests'] = {t.id(): {"errors": len(tresults.errors),
+                                                "failures": len(tresults.failures),
+                                                "skipped": len(tresults.skipped),
                                                 "ran": tresults.testsRun}}
 
         else:
@@ -546,6 +548,8 @@ class Services(daemon.Daemon):
                                         "failures": 1,
                                         "skipped": 0,
                                         "ran": 1}}
+
+        logging.info("Return Value for RunTest: {}".format(retval))
         return retval
 
     def CountTestModulesInFile(self, test=None, **kwargs):
