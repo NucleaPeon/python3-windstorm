@@ -63,10 +63,12 @@ function UpdateProject() {
     $.post('http://localhost:9090/Services/UpdateProject/',
            {project: $('#modal-header-title').html(),
             files: items,
-            description: $('#projectdescription').val()},
+            description: $('#projectdescription').val(),
+            pythonpath: $('#optpythonpath').val()},
            function(data) {
                $("#Messages").append($("<li>").addClass("list-group-item").html("Updated Project" + $('#modal-header-title').html()));
                $("#numberoffiles").val(data.results.files.length);
+               $('#optpythonpath').val(data.results.pythonpath[0]); // TODO: multiple python paths should be viewable, change ui
                $('#list_projectfiles').empty();
                GenFileBlock(data.results.files);
                $("#projectsize").val(data.results.size);

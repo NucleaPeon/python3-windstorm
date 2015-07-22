@@ -278,8 +278,11 @@ class Services(daemon.Daemon):
 
         return dict(deleted=json.dumps(retval))
 
+    def __remove_file_prefix__(self, files):
+        return list(set(map(lambda x: x[7:] if x[0:7] == "file://" else x, files)))
+
     def UpdateProject(self, project=None, files=None,
-                      description=None, **kwargs):
+                      description=None, pythonpath=None, **kwargs):
         logging.info("\tfiles: {}".format(files))
         if project is None:
             return project
@@ -290,7 +293,7 @@ class Services(daemon.Daemon):
         # Remove file:// from path
         if not files is None:
             files = map(lambda x: x.decode("utf-8"), files)
-            files = list(set(map(lambda x: x[7:] if x[0:7] == "file://" else x, files)))
+            files = self.__remove_file_prefix__(files)
 
         else:
             files = []
@@ -322,11 +325,11 @@ class Services(daemon.Daemon):
                 logging.warning("File {} not found, removing".format(f))
                 del f
 
-        #self.projects[project] = {}
-        logging.info(self.projects)
+        pythonpath = [pp.decode("utf-8") for pp in pythonpath] if not pythonpath is None else []
         self.projects[project]["files"] = files
         self.projects[project]["description"] = description
         self.projects[project]["size"] = int(Decimal(size/Decimal(1000000)).quantize(Decimal('1.'), rounding=ROUND_UP))
+        self.projects[project]["pythonpath"] = self.__remove_file_prefix__(pythonpath)
         written = self.__persist_projects(self.__directory__, projects=self.projects[project])
         return self.projects[project]
 
