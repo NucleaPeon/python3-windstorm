@@ -25,6 +25,7 @@ def write_projects(directory, projects):
         if not checkdir:
             return False
 
+        # Place into its own check method:
         if not os.path.exists(checkdir):
             try:
                 logging.info("Creating {} Directory".format(PROJECT_DIR))
@@ -74,7 +75,17 @@ def read_projects(directory, projects=[]):
         return None # FIXME return specified projects
 
     else:
-        for p in os.listdir(os.path.join(directory, PROJECT_DIR)):
+        checkdir = os.path.join(directory, PROJECT_DIR)
+        if not os.path.exists(checkdir):
+            try:
+                logging.info("Creating {} Directory".format(PROJECT_DIR))
+                os.makedirs(checkdir, exist_ok=True)
+
+            except PermissionError as pE:
+                logging.error(str(pE))
+                return False
+
+        for p in os.listdir(checkdir):
             cp = configparser.ConfigParser()
             logging.info(os.path.join(directory, PROJECT_DIR, p))
             cp.read(os.path.join(directory, PROJECT_DIR, p))
@@ -127,6 +138,16 @@ def write_groups(directory, groups=[]):
     return False
 
 def read_suites(directory, suites=[]):
+    checkdir = os.path.join(directory, SUITE_DIR)
+    if not os.path.exists(checkdir):
+        try:
+            logging.info("Creating {} Directory".format(SUITE_DIR))
+            os.makedirs(checkdir, exist_ok=True)
+
+        except PermissionError as pE:
+            logging.error(str(pE))
+            return False
+
     retval = {}
     if len(suites) > 0:
         logging.info("specific suite")

@@ -219,7 +219,6 @@ function CountTestsForProject(name, callback) {
         url: 'http://localhost:9090/Services/GetProjectsByName/',
         data: {name: name},
         success: function(project) {
-            console.log("CountTests -> GetProjectByName:");
             console.log(project);
             if (project.hasOwnProperty("pythonpath")) {
                 console.log("Found python path");
@@ -234,7 +233,7 @@ function CountTestsForProject(name, callback) {
                 success: function(data) {
                     $('#badge' + name).html(data.results.length);
                     if (callback !== undefined) {
-                        callback(data.results.length, data.results);
+                        callback(data.results.length, data.results, project.results.pythonpath);
                     }
                 },
                 dataType: "json"
