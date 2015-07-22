@@ -47,13 +47,12 @@ def write_projects(directory, projects):
                                       p['files'])
 
 
-        cp['project'] = {'plugin': p['plugin']}
+        cp['project'] = {'plugin': p['plugin'],
+                         'pythonpath': p['pythonpath'][0]}
         cp['depfiles'] = {y.split(os.sep)[-1]: y for y in p['depends']['files']} if not p['depends'].get('files') is None else {}
         cp['windstorminstances'] = {}
         cp['tests'] = {'autoupdate-on-run': True,
                        'persist': True}
-
-        cp['project'] = {'pythonpath': ':'.join(p['pythonpath'])}
         with open(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])), 'w') as cpwrite:
             cp.write(cpwrite)
             logging.info("Wrote configuration file of project {}".format(p))
