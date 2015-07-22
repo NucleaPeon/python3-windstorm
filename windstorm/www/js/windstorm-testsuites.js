@@ -10,18 +10,31 @@ $(document).on("ready", function() {
         });
     });
     $("#ProjectSelect").on("shown.bs.modal", function() {
-        GetProjects();
+        GetProjects(function() {
+            $.post('http://localhost:9090/Services/GetTestSuites/',
+                {},
+                function(data) {
+                    var testsuitename = $("#testsuitetitle").html();
+                    for (var i=0; i < data.results[testsuitename]['projects'].length; i++) {
+                        $('#include' + data.results[testsuitename]['projects'][i]).prop("checked", true);
+                    }
+                }
+            );
+        });
         $('#projectloadergif').addClass("hidden");
 
     });
     $("#ProjectSelect").on("hidden.bs.modal", function() {
         $('.progressbar').empty()
         $('#accept_ts_btn').off("click");
+        $("#projectlisting .projectdata .checkbox").prop("checked", false);
     });
 
     $("#AddTestSuite").on("hidden.bs.modal", function() {
         $(document).off("keypress");
         $("#tsname").val("");
+        $('#testsuitetitle').html("");
+        // Disable all checkboxes in projectlisting
     });
 
     $("#RunTestModal").on("shown.bs.modal", function() {
@@ -129,7 +142,7 @@ function FileBrowseNotify(testsuitename, filefoldername) {
     alert("Please drag and drop your file or folder into the text input");
 }
 
-function GetProjects() {
+function GetProjects(callback) {
     // Return all projects, or display notification that no projects exist
     $.post('http://localhost:9090/Services/GetProjects/',
            {},
@@ -183,6 +196,9 @@ function GetProjects() {
                             )
                             .append($("<div>").attr("id", "pb" + name).addClass("progressbar"));
                     }
+                }
+                if (callback !== undefined) {
+                    callback();
                 }
             }
     );
@@ -269,6 +285,7 @@ function AppendTestSuite(testsuitename) {
                                     .append($("<span>").addClass("input-group-addon")
                                         .append("<span>").addClass("btn btn-default").html("Add Tests From...")
                                         .on("click", function() {
+                                            $('#testsuitetitle').html(testsuitename);
                                             $('#ProjectSelect').modal("show");
                                             // Add accept button event to update test values
                                             $('#accept_ts_btn').on("click", function() {

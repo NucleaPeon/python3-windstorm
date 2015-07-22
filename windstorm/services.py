@@ -151,9 +151,7 @@ class Services(daemon.Daemon):
 
     def __load_suites_and_groups(self, in_dir, suites=[], groups=[]):
         """ Load using configparser. """
-        logging.info("__load_suites_and_groups")
         self.testsuites.update(wsconfig.read_suites(in_dir, suites=suites))
-        logging.info(self.testsuites)
 
     def __persist_projects(self, in_dir, projects=None):
         if not isinstance(projects, list):
