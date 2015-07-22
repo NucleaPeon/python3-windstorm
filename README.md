@@ -14,6 +14,10 @@ Name is based on the technology it is written upon: `tornado`.
 
 Codenames for releases should reflect... windstorms.
 
+## Codename "Moderate Maestro" (0.9x - 1.0 series)
+
+See Milestones for bugs and features that apply to this release.
+
 ## Codename "Light breeze" (0.x series)
 
 We are finally at a pre-release for Light Breeze. It's at a state where it can run
