@@ -152,6 +152,7 @@ function ProjectSettingsModal(title, callback) {
            function(project) {
                $('#numberoffiles').val(project.results.files.length);
                $('#projectsize').val(project.results.size);
+               $('#optpythonpath').val(project.results.pythonpath[0]);
 
            })
     // Get project details based on title

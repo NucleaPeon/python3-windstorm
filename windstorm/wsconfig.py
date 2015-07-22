@@ -53,7 +53,7 @@ def write_projects(directory, projects):
         cp['tests'] = {'autoupdate-on-run': True,
                        'persist': True}
 
-        cp['pythonpath'] = {i: pp for i, pp in enumerate(p['pythonpath'])}
+        cp['project'] = {'pythonpath': ':'.join(p['pythonpath'])}
         with open(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])), 'w') as cpwrite:
             cp.write(cpwrite)
             logging.info("Wrote configuration file of project {}".format(p))
@@ -89,7 +89,10 @@ def read_projects(directory, projects=[]):
             project['files'] = read_tests_from_db(directory, p)
             project['size'] = 0
             project['plugin'] = cp['project']['plugin']
+            project['pythonpath'] = cp['project']['pythonpath'].split(':')
+
             retval[p] = project
+
 
     return retval
 

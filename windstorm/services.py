@@ -403,6 +403,7 @@ class Services(daemon.Daemon):
         logging.info(projects)
         self.testsuites[suite]["projects"] = projects
         self.__persist_suites(self.__directory__, suites=suite, cache=self.testsuites)
+        return self.testsuites[suite]
 
     def GetGroupTestFilenames(self, group=None, **kwargs):
         """

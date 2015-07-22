@@ -219,6 +219,11 @@ function CountTestsForProject(name, callback) {
         url: 'http://localhost:9090/Services/GetProjectsByName/',
         data: {name: name},
         success: function(project) {
+            console.log("CountTests -> GetProjectByName:");
+            console.log(project);
+            if (project.hasOwnProperty("pythonpath")) {
+                console.log("Found python path");
+            }
             $.ajax({
                 type: "POST",
                 url: 'http://localhost:9090/Services/LoadTestsByPlugin/',
@@ -360,6 +365,8 @@ function UpdateProjectTests(testsuitename, successcb) {
             {projects: checked,
             suite: testsuitename},
             function(data) {
+                console.log("Successful update on suite");
+                console.log(data);
             },
             "json"
         ).done(function(data) {
@@ -416,7 +423,6 @@ function RefreshTestViewInSuite(testsuitename) {
                             .append($("<div>").addClass("panel-heading")
                                 .append($("<h3>").addClass("panel-title").html(data.results.projects[i]))
                                 .on("click", function() {
-
                                     $('#collapse' + testsuitename + data.results.projects[i]).collapse('toggle');
                                 })
                             )
@@ -477,7 +483,6 @@ function StartRunTests(completecallback) {
                 $('#run_overall').css("width",  "100%");
                 $("#run").removeAttr("disabled");
                 $('#runtestsauto' + testsuitename).removeAttr("disabled")
-                console.log("Preparing to call success()");
                 if (success !== undefined) {
                     console.log("Calling success callback");
                     success();
@@ -495,7 +500,8 @@ function StartRunTests(completecallback) {
                 * callback: function to call once one test module has run
                 */
                 $.post("http://localhost:9090/Services/RunTest/",
-                    {test: tests[0]},
+                    {test: tests[0],
+                     pythonpath: null},
                     function(data) {
                         $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
                         $('#run_overall').css("width",  ((Number($('#run_overall').attr("aria-valuenow"))/Number($('#run_overall').attr("aria-valuemax"))) * 100) + "%");
