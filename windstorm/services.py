@@ -484,12 +484,9 @@ class Services(daemon.Daemon):
             - tuple (module, count,)
         """
         logging.info("PYTHON PATH {}".format(pythonpath))
-        logging.info(type(pythonpath))
         splitpath = list(filter(None, filename.split(os.sep)))
-        if pythonpath is None:
+        if pythonpath is None or not pythonpath:
             logging.info("Preparing with path insert to {}".format(os.path.join(os.sep, *splitpath[:-1])))
-            logging.info(filename)
-            logging.info(splitpath)
             sys.path.insert(0, os.path.join(os.sep, *splitpath[:-1]))
 
         else:
@@ -498,8 +495,13 @@ class Services(daemon.Daemon):
 
         tloader = unittest.TestLoader()
         try:
-            mod = importlib.import_module(splitpath[-1].rstrip(".py"))
+            modulename = splitpath[-1].rstrip(".py")
+            logging.info("Module name to import via importlib: {}".format(modulename))
+            logging.info("Sys Path: {}".format(sys.path))
+            mod = importlib.import_module(modulename)
+            logging.info("Module {} has been imported".format(mod))
             loadedtests = tloader.loadTestsFromModule(mod)
+            logging.info("Tests have been loaded: {} found".format(loadedtests.countTestCases()))
             return (mod, loadedtests.countTestCases(),)
 
         except ImportError as iE:
