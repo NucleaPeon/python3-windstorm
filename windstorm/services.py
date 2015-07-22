@@ -351,7 +351,6 @@ class Services(daemon.Daemon):
             logging.info(path)
             mod = importlib.import_module(plugin)
             loadedtests = mod.find(path)
-            logging.info(loadedtests)
 
         except Exception as E:
             logging.error("Module failed to import, plugin {}".format(plugin))
@@ -455,8 +454,8 @@ class Services(daemon.Daemon):
                 # Run through plugins to get filenames
                 for p in projects:
                     for pth in self.projects[p]['files']:
-                        tests[suite][p] = self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
-                                                                 path=[bytes(pth, "utf-8")])
+                        tests[suite][p] = [os.path.join(x[0], x[1]) for x in self.LoadTestsByPlugin(plugin=[bytes(self.projects[p]["plugin"], "utf-8")],
+                                                                                path=[bytes(pth, "utf-8")])]
 
             if self.testsuites[suite]["additional"]:
                 logging.warning("TODO: Additional files not implemented")
@@ -475,6 +474,8 @@ class Services(daemon.Daemon):
         :Returns:
             - tuple (module, count,)
         """
+        logging.info("PYTHON PATH {}".format(pythonpath))
+        logging.info(type(pythonpath))
         splitpath = list(filter(None, filename.split(os.sep)))
         if pythonpath is None:
             logging.info("Preparing with path insert to {}".format(os.path.join(os.sep, *splitpath[:-1])))
@@ -487,30 +488,51 @@ class Services(daemon.Daemon):
                 sys.path.insert(0, pythonpath)
 
         tloader = unittest.TestLoader()
-        mod = importlib.import_module(splitpath[-1].rstrip(".py"))
-        loadedtests = tloader.loadTestsFromModule(mod)
-        return (mod, loadedtests.countTestCases(),)
+        try:
+            mod = importlib.import_module(splitpath[-1].rstrip(".py"))
+            loadedtests = tloader.loadTestsFromModule(mod)
+            return (mod, loadedtests.countTestCases(),)
+
+        except ImportError as iE:
+            logging.error("Was unable to import test module")
+            logging.error(str(iE))
+            return (None, 0,)
+
+        except Exception as E:
+            logging.error("Encountered fatal error in test")
+            #logging.error(str(E))
+            return (None, 0,)
 
     def RunTest(self, test=None, pythonpath=None, **kwargs):
         if test is None:
             return None
 
-        logging.info("\tRunning Test {}".format(test))
         test = test[0].decode("utf-8")
+        pythonpath = pythonpath[0].decode("utf-8") if not pythonpath is None else None
+        logging.info("\tRunning Test {}".format(test))
+        logging.info("\tTest Pythonpath is {}".format(pythonpath))
         mod, count = self._prepare_tests(test, pythonpath)
-        tloader = unittest.TestLoader()
-        loadedtests = tloader.loadTestsFromModule(mod)
         retval = {}
-        # FIXME: Create a Run Plugin module
-        for lt in loadedtests:
-            retval['count'] = count
-            for t in lt:
-                tresults = t.run()
-                retval['tests'] = {t.id(): {"errors": tresults.errors,
-                                            "failures": tresults.failures,
-                                            "skipped": tresults.skipped,
-                                            "ran": tresults.testsRun}}
+        if not mod is None:
+            tloader = unittest.TestLoader()
+            loadedtests = tloader.loadTestsFromModule(mod)
 
+            # FIXME: Create a Run Plugin module
+            for lt in loadedtests:
+                retval['count'] = count
+                for t in lt:
+                    tresults = t.run()
+                    retval['tests'] = {t.id(): {"errors": tresults.errors,
+                                                "failures": tresults.failures,
+                                                "skipped": tresults.skipped,
+                                                "ran": tresults.testsRun}}
+
+        else:
+            retval['count'] = count
+            retval['tests'] = {test: {"errors": 0,
+                                        "failures": 1,
+                                        "skipped": 0,
+                                        "ran": 1}}
         return retval
 
     def CountTestModulesInFile(self, test=None, **kwargs):

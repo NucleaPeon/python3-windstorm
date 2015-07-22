@@ -499,8 +499,7 @@ function StartRunTests(completecallback) {
                 * callback: function to call once one test module has run
                 */
                 $.post("http://localhost:9090/Services/RunTest/",
-                    {test: tests[0],
-                     pythonpath: null},
+                    {test: tests[0]},
                     function(data) {
                         $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
                         $('#run_overall').css("width",  ((Number($('#run_overall').attr("aria-valuenow"))/Number($('#run_overall').attr("aria-valuemax"))) * 100) + "%");

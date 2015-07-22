@@ -187,7 +187,8 @@ def read_tests_from_db(directory, projtitle):
 
     try:
         with shelve.open(os.path.join(directory, DB_FILE)) as db:
-            return db[projtitle]
+            if projtitle in db:
+                return db[projtitle]
 
     except PermissionError as pE:
         logging.error(str(pE))
