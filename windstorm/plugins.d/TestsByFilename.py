@@ -43,6 +43,6 @@ def find(path):
             for root, _dir, _files in os.walk(p):
                 _filter = list(filter(lambda x: not prog.match(x) is None, _files))
                 if _filter:
-                    tests.extend([(root, f,) for f in _filter])
+                    tests.extend([("{}{}".format(root, os.sep), f,) for f in _filter])
 
     return tests

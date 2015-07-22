@@ -149,9 +149,11 @@ class Services(daemon.Daemon):
 
         logging.info(self.projects)
 
-    def __load_suites_and_groups(self, in_dir):
+    def __load_suites_and_groups(self, in_dir, suites=[], groups=[]):
         """ Load using configparser. """
         logging.info("__load_suites_and_groups")
+        self.testsuites.update(wsconfig.read_suites(in_dir, suites=suites))
+        logging.info(self.testsuites)
 
     def __persist_projects(self, in_dir, projects=None):
         if not isinstance(projects, list):
@@ -159,8 +161,11 @@ class Services(daemon.Daemon):
 
         return wsconfig.write_projects(self.__directory__, projects)
 
-    def __persist_suites_and_groups(self, in_dir, suites=None, groups=None):
-        logging.info("__persist_suites_and_groups")
+    def __persist_suites(self, in_dir, suites=None, cache={}):
+        if not isinstance(suites, list):
+            suites = [suites]
+
+        wsconfig.write_suites(self.__directory__, suites=suites, cache=cache)
 
     def __remove_projects(self, in_dir, projects=None):
         logging.info("FIXME")
@@ -393,8 +398,10 @@ class Services(daemon.Daemon):
         logging.info("Suite is {}".format(suite))
         projects = list(map(lambda x: x.decode("utf-8"), projects))
         logging.info("Projects for suite are {}".format(projects))
+        logging.info(self.testsuites[suite]["projects"])
+        logging.info(projects)
         self.testsuites[suite]["projects"] = projects
-        self.__persist_suites_and_groups(self.__directory__, suites=suite)
+        self.__persist_suites(self.__directory__, suites=suite, cache=self.testsuites)
 
     def GetGroupTestFilenames(self, group=None, **kwargs):
         """
@@ -466,7 +473,7 @@ class Services(daemon.Daemon):
         :Returns:
             - tuple (module, count,)
         """
-        splitpath = filename.split(os.sep)
+        splitpath = list(filter(None, filename.split(os.sep)))
         if pythonpath is None:
             logging.info("Preparing with path insert to {}".format(os.path.join(os.sep, *splitpath[:-1])))
             logging.info(filename)

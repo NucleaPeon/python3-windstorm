@@ -22,6 +22,9 @@ def write_projects(directory, projects):
     cp = None
     for p in projects:
         checkdir = os.path.join(directory, PROJECT_DIR)
+        if not checkdir:
+            return False
+
         if not os.path.exists(checkdir):
             try:
                 logging.info("Creating {} Directory".format(PROJECT_DIR))
@@ -32,8 +35,7 @@ def write_projects(directory, projects):
                 return False
 
         cp = configparser.ConfigParser()
-        if checkdir:
-            cp.read(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])))
+        cp.read(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])))
 
         # request writing file database if option is set
         logging.info("Sections in config parser file: {}".format(cp.sections()))
@@ -48,14 +50,12 @@ def write_projects(directory, projects):
         cp['project'] = {'plugin': p['plugin']}
         cp['depfiles'] = {y.split(os.sep)[-1]: y for y in p['depends']['files']} if not p['depends'].get('files') is None else {}
         cp['windstorminstances'] = {}
-        cp['tests'] = {'shelve-filename': "{}.db".format(p['title']),
-                       'autoupdate-on-run': True,
+        cp['tests'] = {'autoupdate-on-run': True,
                        'persist': True}
 
         with open(os.path.join(directory, PROJECT_DIR, "{}.conf".format(p['title'])), 'w') as cpwrite:
             cp.write(cpwrite)
             logging.info("Wrote configuration file of project {}".format(p))
-
 
     return True
 
@@ -71,7 +71,7 @@ def read_projects(directory, projects=[]):
     logging.info(directory)
     logging.info(projects)
     if len(projects) > 0:
-        pass
+        return None # FIXME return specified projects
 
     else:
         for p in os.listdir(os.path.join(directory, PROJECT_DIR)):
@@ -92,14 +92,55 @@ def read_projects(directory, projects=[]):
 
     return retval
 
-def write_suite(suite, directory):
-    pass
+def write_suites(directory, suites, cache={}):
+    logging.info("write_suites")
+    cp = None
+    for s in suites:
+        checkdir = os.path.join(directory, SUITE_DIR)
+        if not os.path.exists(checkdir):
+            try:
+                logging.info("Creating {} Directory".format(SUITE_DIR))
+                os.makedirs(checkdir, exist_ok=True)
 
-def write_group(group, directory):
-    pass
+            except PermissionError as pE:
+                logging.error(str(pE))
+                return False
 
-def read_suite(suite, directory):
-    pass
+        cp = configparser.ConfigParser()
+        cp.read(os.path.join(directory, SUITE_DIR, "{}.conf".format(s)))
+        logging.info(s)
+        logging.info(cache)
+        cp['projects'] = {x: True for x in cache[s]['projects']}
+
+
+        with open(os.path.join(directory, SUITE_DIR, "{}.conf".format(s)), 'w') as cpwrite:
+            cp.write(cpwrite)
+            logging.info("Wrote configuration file of suite {}".format(s))
+
+    return False
+
+
+def write_groups(directory, groups=[]):
+    return False
+
+def read_suites(directory, suites=[]):
+    retval = {}
+    if len(suites) > 0:
+        logging.info("specific suite")
+
+    else:
+        for s in os.listdir(os.path.join(directory, SUITE_DIR)):
+            cp = configparser.ConfigParser()
+            logging.info(os.path.join(directory, SUITE_DIR, s))
+            cp.read(os.path.join(directory, SUITE_DIR, s))
+            s = s.replace(".conf", "")
+            retval[s] = {'projects': [],
+                         'additional': []}
+            for k, v in cp['projects'].items():
+                if v:
+                    retval[s]['projects'].append(k)
+
+    return retval
 
 def write_tests_to_db(directory, projtitle, files):
     if not os.path.exists(os.path.join(directory, DB_FILE)):
