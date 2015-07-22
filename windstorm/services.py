@@ -185,6 +185,15 @@ class Services(daemon.Daemon):
 
         return None
 
+    def GetProjectsBySuite(self, suite=None, **kwargs):
+        if not suite is None:
+            suite = suite[0].decode('utf-8')
+            if suite in self.testsuites:
+                return {x: self.projects[x] for x in self.testsuites[suite]['projects']}
+
+        return {}
+
+
     def GetProjectPathsByName(self, name=None, **kwargs):
         if not name is None:
             name = name[0].decode('utf-8')
@@ -502,6 +511,8 @@ class Services(daemon.Daemon):
             logging.error("Encountered fatal error in test")
             #logging.error(str(E))
             return (None, 0,)
+
+
 
     def RunTest(self, test=None, pythonpath=None, **kwargs):
         if test is None:

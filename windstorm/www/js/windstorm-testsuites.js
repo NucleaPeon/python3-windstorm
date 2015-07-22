@@ -498,24 +498,35 @@ function StartRunTests(completecallback) {
                 * totaltests: length of every test module being run (does not change)
                 * callback: function to call once one test module has run
                 */
-                $.post("http://localhost:9090/Services/RunTest/",
-                    {test: tests[0]},
-                    function(data) {
-                        $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
-                        $('#run_overall').css("width",  ((Number($('#run_overall').attr("aria-valuenow"))/Number($('#run_overall').attr("aria-valuemax"))) * 100) + "%");
-                        $('#run_overall').html(tests[0]);
-                        $('#run_single').attr("aria-valuenow",  0);
-                        $('#run_single').css("width",  "0%");
-                    },
-                    "json"
-                ).done(function(data) {
-                    console.log("Finished running test");
-                    // Recall this method but with the first element chopped. This means
-                    // our width will increase based on its equation until it reaches 100.
-                    $('#run_single').attr("aria-valuenow",  100);
-                    $('#run_single').css("width",  "100%");
-                    callback(tests.slice(1), totaltests, callback, success);
-                });
+                $.post("http://localhost:9090/Services/GetProjectsBySuite/",
+                       {suite: testsuitename},
+                       function(projects) {
+                           var pps = [];
+                           for (var proj in Object.keys(projects.results)) {
+                               pps.push(projects.results[Object.keys(projects.results)[proj]].pythonpath);
+                           }
+                           $.post("http://localhost:9090/Services/RunTest/",
+                                {test: tests[0],
+                                 pythonpath: pps[0]}, // HACK
+                                function(data) {
+                                    $('#run_overall').attr("aria-valuenow", Number($('#run_overall').attr("aria-valuenow")) + 1);
+                                    $('#run_overall').css("width",  ((Number($('#run_overall').attr("aria-valuenow"))/Number($('#run_overall').attr("aria-valuemax"))) * 100) + "%");
+                                    $('#run_overall').html(tests[0]);
+                                    $('#run_single').attr("aria-valuenow",  0);
+                                    $('#run_single').css("width",  "0%");
+                                },
+                                "json"
+                            ).done(function(data) {
+                                console.log("Finished running test");
+                                // Recall this method but with the first element chopped. This means
+                                // our width will increase based on its equation until it reaches 100.
+                                $('#run_single').attr("aria-valuenow",  100);
+                                $('#run_single').css("width",  "100%");
+                                callback(tests.slice(1), totaltests, callback, success);
+                            });
+                       },
+                       "json"
+                  );
             }
         };
 
