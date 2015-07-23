@@ -1,6 +1,30 @@
 # python3-windstorm
 Python3 Tornado-based continuous build and test suite
 
+## How to use:
+
+**Start Web Host**
+
+    ./windstorm.py --start
+    
+**Stop Web Host**
+
+    ./windstorm.py --stop
+    
+**Restart Web Host**
+
+    ./windstorm.py
+    
+Once the service has started, navigate to `localhost:9090` on your web browswer to view the software.
+
+Click the **Software** side-link to add folder(s) and file(s) which are part of the project.
+Click the **Test Suite** side-link to add Suites (series of tests that encorporate one or more projects)
+Once a Suite is loaded with tests, click the **Run Tests** button to view some settings (that don't yet work) and progress bars. 
+Click the **Run** button to start testing, or you can quick-run the project by clicking on the button next to the **Run Tests** button, the smaller button with the play symbol |>.
+Test results are not yet displayed, but enabling firebug and looking at the tornado log (stdout) will describe the tests.
+
+## History
+
 After trying out `buildbot` and seeing how unpleasant it was to deal with off the bat, I have decided to build a simple, functional configuration-based build and test suite
 
 * built in python3
