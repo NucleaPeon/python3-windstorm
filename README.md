@@ -17,11 +17,11 @@ Python3 Tornado-based continuous build and test suite
     
 Once the service has started, navigate to `localhost:9090` on your web browswer to view the software.
 
-Click the **Software** side-link to add folder(s) and file(s) which are part of the project.
-Click the **Test Suite** side-link to add Suites (series of tests that encorporate one or more projects)
-Once a Suite is loaded with tests, click the **Run Tests** button to view some settings (that don't yet work) and progress bars. 
-Click the **Run** button to start testing, or you can quick-run the project by clicking on the button next to the **Run Tests** button, the smaller button with the play symbol |>.
-Test results are not yet displayed, but enabling firebug and looking at the tornado log (stdout) will describe the tests.
+* Click the **Software** side-link to add folder(s) and file(s) which are part of the project.
+* Click the **Test Suite** side-link to add Suites (series of tests that encorporate one or more projects)
+* Once a Suite is loaded with tests, click the **Run Tests** button to view some settings (that don't yet work) and progress bars. 
+* Click the **Run** button to start testing, or you can quick-run the project by clicking on the button next to the **Run Tests** button, the smaller button with the play symbol |>.
+* Test results are not yet displayed, but enabling firebug and looking at the tornado log (stdout) will describe the tests.
 
 ## History
 
