@@ -17,6 +17,22 @@ Codenames for releases should reflect... windstorms.
 ## Codename "Moderate Maestro" (0.9x - 1.0 series)
 
 See Milestones for bugs and features that apply to this release.
+See Windstorm-Maestro-UI.pdf for scan of improved prototype webpage design.
+
+Notes on the new design:
+
+* Logging in is mandatory, although tornado should have a flag for disabling logging in for those who just want a purely local non-intrusive testing suite. Obviously this is not secure when enabled and will output warnings.
+* Compact design with more modal windows and absolute elements, more focus on drag n drop and less focus on having buttons for everything
+* Use tooltips and glyphs/images to represent state instead of text and collapseable divs.
+* Use backbone.js for organizing views, models and collections and syncing of data to a mongodb database.
+* Have notifications done through side tabs that are disabled if no new messages exist
+* Have a footer for program information and licensing that is out of the way
+* No more test suites/test groups, projects may contain tests and other projects.
+* Testing is done through the project object and contains a progress bar overview.
+* Other pages, such as results and setting pages are accessible via a link at the top of the page below the header, but still utilizes the one-page layout style so data is cached/quickly retrieved.
+* Use HTML pushes to update information
+* Tornado is used for credentials, running of programs and test suites, connecting to other windstorm instances and perhaps mongodb.
+* A nice-to-have is a tornado webpage -based log viewer with a separate admin account that is spec'd in the windstorm config file. Ex: Email administrator on error/warning, batch send logs every [x] duration.
 
 ## Codename "Light breeze" (0.x series)
 
