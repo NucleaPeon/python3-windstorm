@@ -110,7 +110,6 @@ class Windstorm(daemon.Daemon):
         super().__init__(self)
         self.pidfile = pidfile
         self.port = port
-        print("Port {}".format(port))
         self.webpath = webroot
         self.loader = template.Loader(self.webpath)
         self.logger = logging.getLogger("WindStormLog")

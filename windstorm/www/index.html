@@ -1,36 +1,24 @@
-{% extends "base.html" %}
-{% block supplimentaryjs %}
-{% end %}
-{% block sidenav %}
-    <li class="list-group-item active" style="cursor:pointer;" onclick="go_home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</li>
-    <li class="list-group-item" style="cursor:pointer;" onclick="go_software()"><span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span> Software</li>
-    <li class="list-group-item" style="cursor:pointer;" onclick="go_testsuite()"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Test Suites</li>
-    <li class="list-group-item" style="cursor:pointer;" onclick="go_results()"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Results</li>
-    <li class="list-group-item" style="cursor:pointer;" onclick="go_settings()"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Settings</li>
-    <li class="list-group-item" style="cursor:pointer;" onclick="go_about()"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</li>
-{% end %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="http://localhost:9090/favicon.ico" />
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="/bootstrap/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/css/windstorm.css">
+        <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+        <script src="/js/jquery-2.1.4.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/js/underscore-min.js"></script>
+        <script src="/js/backbone-min.js"></script>
 
-{% block main_content %}
-<div class="panel panel-default">
-  <!-- Default panel contents -->
-  <div class="panel-heading">Test And Deployment Configuration Overview</div>
-  <div class="panel-body">
-    <p>Windstorm: Gentle Breeze (Version 0.1 Development)</p>
-  </div>
-  <!-- Table -->
-  <table class="table">
-    <tr>
-        <td>Col1</td><td>Col2</td><td>Col3</td>
-    </tr>
-    <tr>
-        <td>Val</td><td>Val</td><td>Val</td>
-    </tr>
-  </table>
-</div>
-{% end %}
-
-{% block customjs %}
-$(document).ready( function() {
-    // Go through and add each component's information into this table: test suites, groups, projects, plugins, etc. with possible quick-adds
-});
-{% end %}
+    </head>
+    <body>
+        <script src="/js/windstorm.js" type="text/javascript"></script>
+    </body>
+</html>
