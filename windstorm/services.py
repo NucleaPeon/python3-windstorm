@@ -11,7 +11,6 @@ import json
 import inspect
 import importlib
 from decimal import *
-import wsconfig
 try:
     import tornado
     import tornado.web
@@ -142,28 +141,23 @@ class Services(daemon.Daemon):
 
     def __load_projects(self, in_dir):
         """ Load using configparser sans tests, save those via shelve."""
-        projects = wsconfig.read_projects(in_dir)
-        logging.info("{}: {}".format(__name__, projects))
-        for key in projects:
-            self.projects[key] = projects[key]
-
         logging.info(self.projects)
 
     def __load_suites_and_groups(self, in_dir, suites=[], groups=[]):
         """ Load using configparser. """
-        self.testsuites.update(wsconfig.read_suites(in_dir, suites=suites))
+        pass
 
     def __persist_projects(self, in_dir, projects=None):
         if not isinstance(projects, list):
              projects = [projects]
 
-        return wsconfig.write_projects(self.__directory__, projects)
+        return None
 
     def __persist_suites(self, in_dir, suites=None, cache={}):
         if not isinstance(suites, list):
             suites = [suites]
 
-        wsconfig.write_suites(self.__directory__, suites=suites, cache=cache)
+        #wsconfig.write_suites(self.__directory__, suites=suites, cache=cache)
 
     def __remove_projects(self, in_dir, projects=None):
         logging.info("FIXME")
