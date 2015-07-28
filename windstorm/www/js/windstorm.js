@@ -48,20 +48,64 @@
   });
 
 
-  var Header = Backbone.View.extend({
-      el: $("body"),
+  var Navigation = Backbone.View.extend({
+      tagName: 'nav',
+      attributes: {
+          "class": "navbar navbar-deafult navbar-static-top"
+      },
       events: {
       },
       initialize: function() {
           _.bindAll(this, 'render');
-          //this.model.bind('change', this.render);
           this.render();
       },
       render: function() {
-          $(this.el).append("<span>Header goes here</span>");
-          return this;
+          $(this.el).append($("<div>").addClass("container-fluid")
+              .append($("<div>").addClass("navbar-header")
+                .append($("<a>").addClass("navbar-brand").attr("href", "#")
+                    .append('<img src="imgs/Skyblaze-1183-TornadoCutieMark.png" height="36px" width="36px" >')
+                )
+              ).append($("<div>").html("<h3><b>Python Windstorm</b> - Testing and Deployment</h3>"))
+        );
+        return this;
       }
   });
+
+  var PageStruct = Backbone.View.extend({
+      el: $("body"),
+      initialize: function() {
+          _.bindAll(this, 'render');
+          this.bind('change', this.render);
+          this.render();
+      },
+      render: function() {
+          // Append all major view components: navigation, main, footer
+          this.navbar = new Navigation();
+          $(this.el).append(this.navbar.el);
+          $(this.el).append($("<div id='main'>"));
+          $(this.el).append($("<div id='footer'>"));
+      }
+  });
+  /**
+   * <nav class="navbar navbar-default navbar-static-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="imgs/Skyblaze-1183-TornadoCutieMark.png" height="36px" width="36px" ></a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <h3><b>Python Windstorm</b> - Testing and Deployment<h3>
+                </div>
+            </div>
+        </nav>
+   *
+   *
+   */
   /**
   var List = Backbone.Collection.extend({
       model: Item
@@ -144,5 +188,5 @@
   });
   var listView = new ListView();
   **/
-  var pageHeader = new Header();
+  var page = new PageStruct();
 })(jQuery);
