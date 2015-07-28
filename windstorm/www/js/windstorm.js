@@ -1,16 +1,68 @@
 (function($){
 
+  var MESSAGE_TYPES = {
+      'Notification': 0,
+      'Warning': 1,
+      'Error': 2
+  }
+
   Backbone.sync = function(method, model, success, error){
+    console.log("TODO: Sync to a source");
     success();
   }
 
-  var Item = Backbone.Model.extend({
+  var User = Backbone.Model.extend({
       defaults: {
-          'part1': "Hello",
-          'part2': "World!"
+          'username': "Guest",
+          'logintime': Date.now(),
+          'permissions': {
+              'read': false,
+              'write': false,
+              'execute': false
+          }
       }
   });
 
+  var Project = Backbone.Model.extend({
+      defaults: {
+          'name': 'foo',
+          'depends': {}
+      }
+  });
+
+  var TestSuite = Backbone.Model.extend({
+      defaults: {
+          'name': 'bar',
+          'locations': [],
+          'plugins': [],
+          'success': function() { console.log("Success"); },
+          'failure': function() { console.log("Failure"); }
+      }
+  });
+
+  var Message = Backbone.Model.extend({
+      defaults: {
+          'message': "Hello World!",
+          'type': MESSAGE_TYPES['Notification']
+      }
+  });
+
+
+  var Header = Backbone.View.extend({
+      el: $("body"),
+      events: {
+      },
+      initialize: function() {
+          _.bindAll(this, 'render');
+          //this.model.bind('change', this.render);
+          this.render();
+      },
+      render: function() {
+          $(this.el).append("<span>Header goes here</span>");
+          return this;
+      }
+  });
+  /**
   var List = Backbone.Collection.extend({
       model: Item
   });
@@ -91,4 +143,6 @@
     }
   });
   var listView = new ListView();
+  **/
+  var pageHeader = new Header();
 })(jQuery);
