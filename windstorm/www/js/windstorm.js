@@ -48,10 +48,10 @@
   });
 
 
-  var Navigation = Backbone.View.extend({
+  var NavigationView = Backbone.View.extend({
       tagName: 'nav',
       attributes: {
-          "class": "navbar navbar-deafult navbar-static-top"
+          "class": "navbar navbar-default navbar-static-top"
       },
       events: {
       },
@@ -71,19 +71,51 @@
       }
   });
 
+  var SoftwareInfoView = Backbone.View.extend({
+      tagName: 'div',
+      attributes: {
+          "id": "SoftwareDetails",
+          "class": "modal fade",
+          "role": "dialog"
+      },
+      events: {
+      },
+      initialize: function() {
+          _.bindAll(this, 'render');
+          this.bind('change', this.render);
+      },
+      render: function() {
+          $(this.el).append($("<div>").addClass("modal-dialog")
+            .append($("<div>").addClass("modal-content")
+                .append($("<div>").addClass("modal-header")
+                    .append($("<span>")
+                        .attr("id", "SoftwareDetailsHeader")
+                        .css("font-size", "140%")
+                        .html("Title")
+                    )
+                )
+             )
+          )
+          return this;
+      }
+  });
+
+
   var PageStruct = Backbone.View.extend({
       el: $("body"),
       initialize: function() {
           _.bindAll(this, 'render');
+          this.modal_softwareinfoview = new SoftwareInfoView();
           this.bind('change', this.render);
           this.render();
       },
       render: function() {
           // Append all major view components: navigation, main, footer
-          this.navbar = new Navigation();
+          this.navbar = new NavigationView();
           $(this.el).append(this.navbar.el);
           $(this.el).append($("<div id='main'>"));
           $(this.el).append($("<div id='footer'>"));
+          $(this.el).append(this.modal_softwareinfoview.render().el);
       }
   });
   /**
