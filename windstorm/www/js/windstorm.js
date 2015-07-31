@@ -11,6 +11,8 @@
     success();
   }
 
+  // Models:
+
   var User = Backbone.Model.extend({
       defaults: {
           'username': "Guest",
@@ -44,6 +46,29 @@
       defaults: {
           'message': "Hello World!",
           'type': MESSAGE_TYPES['Notification']
+      }
+  });
+
+  // Views:
+
+  var ProjectDropView = Backbone.View.extend({
+      initialize: function() {
+          _.bindAll(this, 'render');
+          this.render();
+      },
+      attributes: {
+          "class": "col-md-10 container dropzone"
+      },
+      render: function() {
+          $(this.el).append($("<h1>").addClass("dropzone-title").html("Drop Folders or Files to Start Project")
+                    .append($("<br />"))
+                    .append($("<h4>").html("or click to set up project manually")));
+          return this;
+      },
+      events: {
+          "click": function() {
+              console.log("Click");
+          }
       }
   });
 
@@ -112,7 +137,21 @@
                     .append($("<span>")
                         .attr("id", "SoftwareDetailsHeader")
                         .css("font-size", "140%")
-                        .html("Title")
+                        .html("Python Windstorm")
+                    )
+                )
+                .append($("<div>").addClass("modal-body row")
+                    .append($("<div>").addClass("col-md-12")
+                        .append($("<div>").addClass("input-group")
+                            .append($("<span>").addClass("input-group-addon").html("Github"))
+                            .append($("<input>").addClass("form-control").attr({
+                                "disabled": "disabled",
+                                "placeholder": "Github",
+                                "type": "text",
+                                "value": "https://github.com/NucleaPeon/python3-windstorm.git"
+                            }))
+
+                        )
                     )
                 )
              )
@@ -133,32 +172,17 @@
           // Append all major view components: navigation, main, footer
           this.navbar = new NavigationView();
           this.swmodal = new SoftwareInfoView();
+          this.projdrop = new ProjectDropView();
           $(this.el).append(this.navbar.el);
           $(this.el).append(this.swmodal.el);
+          $(this.el).append($("<div>").addClass("col-md-1 container"))
+                    .append(this.projdrop.el)
+                    .append($("<div>").addClass("col-md-1 container"));
+
           $(this.el).append($("<div id='main'>"));
           $(this.el).append($("<div id='footer'>"));
       }
   });
-  /**
-   * <nav class="navbar navbar-default navbar-static-top">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#"><img src="imgs/Skyblaze-1183-TornadoCutieMark.png" height="36px" width="36px" ></a>
-                </div>
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <h3><b>Python Windstorm</b> - Testing and Deployment<h3>
-                </div>
-            </div>
-        </nav>
-   *
-   *
-   */
   /**
   var List = Backbone.Collection.extend({
       model: Item

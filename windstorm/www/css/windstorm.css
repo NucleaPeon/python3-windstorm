@@ -25,3 +25,14 @@
 .input-group input[type=text] {
     background-color:white !important;
 }
+
+.dropzone {
+    border-style: dashed;
+    border-width: 5px;
+    padding: 5px 5px 5px 5px;
+}
+
+.dropzone-title {
+    font-size: 4em;
+    text-align: center;
+}
