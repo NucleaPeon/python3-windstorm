@@ -53,37 +53,48 @@
 
   var ProjectDropView = Backbone.View.extend({
       initialize: function() {
-          _.bindAll(this, 'render', 'ondrop', 'dragondiv', 'droppable');
+          _.bindAll(this, 'render', 'ondrop', 'dragondiv', "onout", "onin");
           this.render();
       },
       events: {
           "drop": "ondrop",
+          "dragenter": "onout",
+          "dragleave": "onin",
           "dragover": "dragondiv",
+          "mouseover": "highlight",
           "click": function() {
               console.log("Click");
           }
       },
       className: "col-md-10 container dropzone",
       render: function() {
+          $(this.el).empty();
           $(this.el).append($("<h1>").addClass("dropzone-title").html("Drop Folders or Files to Start Project")
                     .append($("<br />"))
                     .append($("<h4>").html("or click to set up project manually")));
           return this;
       },
+      onout: function(event, ui) {
+          $(this.el).css("background-color", "white");
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+      },
+      onin: function(event, ui) {
+          $(this.el).css("background-color", "white");
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+      },
       ondrop: function(event) {
-          console.log("ondrop");
+          $(this.el).css("background-color", "white");
+          console.log("TODO: Create project from drop data");
           event.preventDefault();
           event.stopPropagation();
           return false;
       },
       dragondiv: function(event) {
-          console.log("dragover");
-          event.preventDefault();
-          event.stopPropagation();
-          return false;
-      },
-      droppable: function(event) {
-          console.log("droppable");
+          $(this.el).css("background-color", "#98FB98");
           event.preventDefault();
           event.stopPropagation();
           return false;
