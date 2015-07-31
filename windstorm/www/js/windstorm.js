@@ -49,13 +49,21 @@
 
   var LogoView = Backbone.View.extend({
       tagName: 'img',
+      initialize: function() {
+          _.bindAll(this, 'render');
+      },
       attributes: {
           'src': "/imgs/Skyblaze-1183-TornadoCutieMark.png",
           'height': "36px",
           'width': "36px"
       },
       events: {
-        "click": function() { alert("click"); }
+          "click": function() {
+              $('#SoftwareDetails').modal('show');
+          }
+      },
+      render: function() {
+          return this;
       }
   });
 
@@ -68,7 +76,6 @@
       },
       initialize: function() {
           _.bindAll(this, 'render');
-          this.softwaremodal = new SoftwareInfoView();
           this.logo = new LogoView();
           this.render();
       },
@@ -96,6 +103,7 @@
       initialize: function() {
           _.bindAll(this, 'render');
           this.bind('change', this.render);
+          this.render();
       },
       render: function() {
           $(this.el).append($("<div>").addClass("modal-dialog")
@@ -124,7 +132,9 @@
       render: function() {
           // Append all major view components: navigation, main, footer
           this.navbar = new NavigationView();
+          this.swmodal = new SoftwareInfoView();
           $(this.el).append(this.navbar.el);
+          $(this.el).append(this.swmodal.el);
           $(this.el).append($("<div id='main'>"));
           $(this.el).append($("<div id='footer'>"));
       }
