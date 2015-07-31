@@ -47,6 +47,17 @@
       }
   });
 
+  var LogoView = Backbone.View.extend({
+      tagName: 'img',
+      attributes: {
+          'src': "/imgs/Skyblaze-1183-TornadoCutieMark.png",
+          'height': "36px",
+          'width': "36px"
+      },
+      events: {
+        "click": function() { alert("click"); }
+      }
+  });
 
   var NavigationView = Backbone.View.extend({
       tagName: 'nav',
@@ -57,13 +68,15 @@
       },
       initialize: function() {
           _.bindAll(this, 'render');
+          this.softwaremodal = new SoftwareInfoView();
+          this.logo = new LogoView();
           this.render();
       },
       render: function() {
           $(this.el).append($("<div>").addClass("container-fluid")
               .append($("<div>").addClass("navbar-header")
                 .append($("<a>").addClass("navbar-brand").attr("href", "#")
-                    .append('<img src="imgs/Skyblaze-1183-TornadoCutieMark.png" height="36px" width="36px" >')
+                    .append(this.logo.render().el)
                 )
               ).append($("<div>").html("<h3><b>Python Windstorm</b> - Testing and Deployment</h3>"))
         );
@@ -105,7 +118,6 @@
       el: $("body"),
       initialize: function() {
           _.bindAll(this, 'render');
-          this.modal_softwareinfoview = new SoftwareInfoView();
           this.bind('change', this.render);
           this.render();
       },
@@ -115,7 +127,6 @@
           $(this.el).append(this.navbar.el);
           $(this.el).append($("<div id='main'>"));
           $(this.el).append($("<div id='footer'>"));
-          $(this.el).append(this.modal_softwareinfoview.render().el);
       }
   });
   /**
