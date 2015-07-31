@@ -53,22 +53,40 @@
 
   var ProjectDropView = Backbone.View.extend({
       initialize: function() {
-          _.bindAll(this, 'render');
+          _.bindAll(this, 'render', 'ondrop', 'dragondiv', 'droppable');
           this.render();
       },
-      attributes: {
-          "class": "col-md-10 container dropzone"
+      events: {
+          "drop": "ondrop",
+          "dragover": "dragondiv",
+          "click": function() {
+              console.log("Click");
+          }
       },
+      className: "col-md-10 container dropzone",
       render: function() {
           $(this.el).append($("<h1>").addClass("dropzone-title").html("Drop Folders or Files to Start Project")
                     .append($("<br />"))
                     .append($("<h4>").html("or click to set up project manually")));
           return this;
       },
-      events: {
-          "click": function() {
-              console.log("Click");
-          }
+      ondrop: function(event) {
+          console.log("ondrop");
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+      },
+      dragondiv: function(event) {
+          console.log("dragover");
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+      },
+      droppable: function(event) {
+          console.log("droppable");
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
       }
   });
 

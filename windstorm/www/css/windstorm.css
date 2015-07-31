@@ -29,8 +29,12 @@
 .dropzone {
     border-style: dashed;
     border-width: 5px;
-    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
 }
+.dropzone:hover {
+    background-color: #D3D3D3;
+}
+
 
 .dropzone-title {
     font-size: 4em;
