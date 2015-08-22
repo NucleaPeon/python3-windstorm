@@ -215,6 +215,19 @@
       }
   });
 
+  var Footer = Backbone.View.extend({
+      initialize: function() {
+          _.bindAll(this, 'render');
+          this.render();
+      },
+      attributes: {
+          "class": "footer"
+      },
+      render: function() {
+          $(this.el).append($("<p>").html("Copyright (C) 2015 PeonDevelopents"));
+          return this;
+      }
+  });
 
   var PageStruct = Backbone.View.extend({
       el: $("body"),
@@ -228,14 +241,19 @@
           this.navbar = new NavigationView();
           this.swmodal = new SoftwareInfoView();
           this.projdrop = new ProjectDropView();
-          $(this.el).append(this.navbar.el);
-          $(this.el).append(this.swmodal.el);
-          $(this.el).append($("<div>").addClass("col-md-1 container"))
+          this.footer = new Footer();
+          var wrapper = $("<div>").addClass("wrapper"); // This element aligns the footer in place at the bottom
+
+          wrapper.append(this.navbar.el);
+          wrapper.append(this.swmodal.el);
+          wrapper.append($("<div>").addClass("col-md-1 container"))
                     .append(this.projdrop.el)
                     .append($("<div>").addClass("col-md-1 container"));
-
-          $(this.el).append($("<div id='main'>"));
-          $(this.el).append($("<div id='footer'>"));
+          wrapper.append($("<div id='main'>"));
+          wrapper.append($($("<div>").addClass("push")));
+          $(this.el).append(wrapper);
+          $(this.el).append(this.footer.el);
+          return this;
       }
   });
   /**
