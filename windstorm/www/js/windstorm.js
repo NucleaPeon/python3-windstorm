@@ -51,9 +51,31 @@
 
   // Views:
 
+  var ProjectModal = Backbone.View.extend({
+      initialize: function() {
+          _.bindAll(this, 'render', 'unrender');
+          // no render, this is called by parent
+
+      },
+      attributes: {
+          "id": "ProjectDisplayModal",
+          "class": "modal fade",
+          "role": "dialog"
+      },
+      render: function() {
+          $(this.el).html("THIS IS A MODAL WINDOW");
+          $('body').append(this.$el);
+          return this;
+      },
+      unrender: function() {
+          $('#ProjectDisplayModal').remove();
+      }
+  });
+
   var ProjectDropView = Backbone.View.extend({
       initialize: function() {
-          _.bindAll(this, 'render', 'ondrop', 'dragondiv', "onout", "onin");
+          _.bindAll(this, 'render', 'unrender', 'ondrop', 'dragondiv', "onout", "onin");
+          this.projmodal = new ProjectModal();
           this.render();
       },
       events: {
@@ -63,16 +85,19 @@
           "dragover": "dragondiv",
           "mouseover": "highlight",
           "click": function() {
-              console.log("Click");
+              this.projmodal.$el.modal('toggle');
           }
       },
       className: "col-md-10 container dropzone",
       render: function() {
-          $(this.el).empty();
           $(this.el).append($("<h1>").addClass("dropzone-title").html("Drop Folders or Files to Start Project")
                     .append($("<br />"))
                     .append($("<h4>").html("or click to set up project manually")));
+          this.projmodal.render();
           return this;
+      },
+      unrender: function() {
+          $(this.el).empty();
       },
       onout: function(event, ui) {
           $(this.el).css("background-color", "white");
@@ -88,6 +113,7 @@
       },
       ondrop: function(event) {
           $(this.el).css("background-color", "white");
+          this.projmodal.$el.modal('toggle');
           console.log("TODO: Create project from drop data");
           event.preventDefault();
           event.stopPropagation();

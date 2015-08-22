@@ -21,6 +21,7 @@ See Windstorm-Maestro-UI.pdf for scan of improved prototype webpage design.
 
 Notes on the new design:
 
+* TODO: On very large screens (1080p +), separate project drop zone and project list into horizontal blocks:   [ pdz ] | [list of projects], otherwise stack them vertically as we are currently doing. Try to accommodate 3K+
 * Logging in is mandatory, although tornado should have a flag for disabling logging in for those who just want a purely local non-intrusive testing suite. Obviously this is not secure when enabled and will output warnings.
 * Compact design with more modal windows and absolute elements, more focus on drag n drop and less focus on having buttons for everything
 * Use tooltips and glyphs/images to represent state instead of text and collapseable divs.
